@@ -73,26 +73,21 @@ $(function() {
 			<select name="scalecode">
 			<?php 
 			$Data=new DB();
-			$Data->show_sel("ResID","ResName","select ResID,CONCAT(PostName,' [',PostGroup,']-',Category) as ResName"
-					." from ".MySQL_Pre."Posts P,".MySQL_Pre."Categories C,".MySQL_Pre."Reserved R"
-					." Where P.PostID=R.PostID AND C.CatgID=R.CatgID Order by ResID"); ?>
+			$Data->show_sel("scalecode","description","select scalecode,description"
+					." from ".MySQL_Pre."scale",PE\GetVal($_POST, 'scalecode')); ?>
 			</select>
 		</div>
 		<div class="FieldGroup">
 			<h3>Home Block:</h3>
 			<select name="HB">
-			<?php 
-			$Data=new DB();
-			$Data->show_sel("ResID","ResName","select ResID,CONCAT(PostName,' [',PostGroup,']-',Category) as ResName"
-					." from ".MySQL_Pre."Posts P,".MySQL_Pre."Categories C,".MySQL_Pre."Reserved R"
-					." Where P.PostID=R.PostID AND C.CatgID=R.CatgID Order by ResID"); ?>
+			<?php
+			$Data->show_sel('select block_municd,block_muni_nm from '.MySQL_Pre.'Block_muni',PE\GetVal($_POST, 'HB')); ?>
 			</select>
 		</div>
 		<div class="FieldGroup">
 			<h3>Office Block:</h3>
 			<select name="OB">
-			<?php 
-			$Data=new DB();
+			<?php
 			$Data->show_sel("ResID","ResName","select ResID,CONCAT(PostName,' [',PostGroup,']-',Category) as ResName"
 					." from ".MySQL_Pre."Posts P,".MySQL_Pre."Categories C,".MySQL_Pre."Reserved R"
 					." Where P.PostID=R.PostID AND C.CatgID=R.CatgID Order by ResID"); ?>
@@ -125,7 +120,6 @@ $(function() {
 			<h3>Present Assembly:</h3>
 			<select name="assembly_temp">
 			<?php 
-			$Data=new DB();
 			$Data->show_sel("ResID","ResName","select ResID,CONCAT(PostName,' [',PostGroup,']-',Category) as ResName"
 					." from ".MySQL_Pre."Posts P,".MySQL_Pre."Categories C,".MySQL_Pre."Reserved R"
 					." Where P.PostID=R.PostID AND C.CatgID=R.CatgID Order by ResID"); ?>
@@ -133,7 +127,6 @@ $(function() {
 			<h3>Office Assembly:</h3>
 			<select name="assembly_off">
 			<?php 
-			$Data=new DB();
 			$Data->show_sel("ResID","ResName","select ResID,CONCAT(PostName,' [',PostGroup,']-',Category) as ResName"
 					." from ".MySQL_Pre."Posts P,".MySQL_Pre."Categories C,".MySQL_Pre."Reserved R"
 					." Where P.PostID=R.PostID AND C.CatgID=R.CatgID Order by ResID"); ?>

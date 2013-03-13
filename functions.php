@@ -95,7 +95,7 @@ function SetCurrForm()
 
 function CheckAuth()
 {
-	$_SESSION['Debug']=$_SESSION['Debug']."CheckSessSRER";
+	$_SESSION['Debug']=GetVal($_SESSION,'Debug')."CheckSessSRER";
     if((!isset($_SESSION['UserName'])) && (!isset($_SESSION['PartMapID'])))
 	{
 		return "Browsing";
@@ -132,7 +132,7 @@ function srer_auth()
 	{
 		if($SessRet!="Valid")
 		{
-			$reg->do_ins_query("INSERT INTO PE2013_logs (`SessionID`,`IP`,`Referrer`,`UserAgent`,`UserID`,`URL`,`Action`,`Method`,`URI`) values"
+			$reg->do_ins_query("INSERT INTO ".MySQL_Pre."logs (`SessionID`,`IP`,`Referrer`,`UserAgent`,`UserID`,`URL`,`Action`,`Method`,`URI`) values"
 						."('".GetVal($_SESSION,'ID')."','".$_SERVER['REMOTE_ADDR']."','".$reg->SqlSafe($t)."','".$_SERVER['HTTP_USER_AGENT']
 						."','".GetVal($_SESSION,'UserName')."','".$reg->SqlSafe($_SERVER['PHP_SELF'])."','".$SessRet.": ("
 						.$_SERVER['SCRIPT_NAME'].")','".$reg->SqlSafe($_SERVER['REQUEST_METHOD'])."','".$reg->SqlSafe($_SERVER['REQUEST_URI'])."');");    
@@ -152,10 +152,10 @@ function srer_auth()
 			$_SESSION['PE2013_TOKEN']=$sess_id;
 			$_SESSION['LifeTime']=time();
 			$t=(isset($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:"");  
-			$reg->do_ins_query("INSERT INTO PE2013_Visitors(ip,vpage,uagent,referrer) values"		
+			$reg->do_ins_query("INSERT INTO ".MySQL_Pre."Visitors(ip,vpage,uagent,referrer) values"		
 				."('".$_SERVER['REMOTE_ADDR']."','".htmlspecialchars($_SERVER['PHP_SELF'])."','".$_SERVER['HTTP_USER_AGENT']
 				."','<".$t.">');");
-			$LogQuery="INSERT INTO PE2013_logs (`SessionID`,`IP`,`Referrer`,`UserAgent`,`UserID`,`URL`,`Action`,`Method`,`URI`) values"		
+			$LogQuery="INSERT INTO ".MySQL_Pre."logs (`SessionID`,`IP`,`Referrer`,`UserAgent`,`UserID`,`URL`,`Action`,`Method`,`URI`) values"		
 				."('".GetVal($_SESSION,'ID')."','".$_SERVER['REMOTE_ADDR']."','".$reg->SqlSafe($t)."','".$_SERVER['HTTP_USER_AGENT']
 				."','".GetVal($_SESSION,'UserName')."','".$reg->SqlSafe($_SERVER['PHP_SELF'])."','Process (".$_SERVER['SCRIPT_NAME'].")','"
 				.$reg->SqlSafe($_SERVER['REQUEST_METHOD'])."','".$reg->SqlSafe($_SERVER['REQUEST_URI'])."');";
@@ -294,7 +294,7 @@ function EditForm($QueryString)
 	echo '&nbsp;&nbsp;&nbsp;<input style="width:80px;" type="submit" value="Save" /></td></tr></table></form>'; 
 }
 
-function ShowSRER($QueryString)
+function ShowData($QueryString)
 { 
 	// Connecting, selecting database 
 	$Data=new DB();
@@ -326,12 +326,12 @@ function ShowSRER($QueryString)
 	return ($i);
 }
 
-function GetPartName()
+function GetOfficeName()
 {
 	if(intval($_SESSION['PartID'])>0)
 	{
 		$Fields=new DB();
-		$PartName=$Fields->do_max_query("Select CONCAT(PartNo,'-',PartName) as PartName from PE2013_PartMap where PartID=".$_SESSION['PartID']);
+		$PartName=$Fields->do_max_query("Select CONCAT(PartNo,'-',PartName) as PartName from ".MySQL_Pre."PartMap where PartID=".$_SESSION['PartID']);
 		$Fields->do_close();
 		unset($Fields);
 	}
@@ -341,7 +341,7 @@ function GetPartName()
 function GetColHead($ColName)
 {
 	$Fields=new DB();
-	$ColHead=$Fields->do_max_query("Select Description from PE2013_FieldNames where FieldName='{$ColName}'");
+	$ColHead=$Fields->do_max_query("Select Caption from ".MySQL_Pre."Fields where FieldName='{$ColName}'");
 	$Fields->do_close();
 	unset($Fields);
 	return (!$ColHead?$ColName:$ColHead);

@@ -1,5 +1,5 @@
 <?php
-use PanchayatElection as PE, PE\DB as DB;
+use PanchayatElection as PE;
 require_once('functions.php');
 PE\srer_auth();
 PE\HtmlHeader("Report");
@@ -42,37 +42,26 @@ $(function() {
 	?>
 	<div class="content">
 		<h2>Personnel Report</h2>
-		<?php PE\ShowMsg(); /*?>
-		<span class="Notice">
-		<b>Please Note: </b>The Applicant is instructed to deposit the necessary fees using the Bank Challan and make sure that the
-		<b>&ldquo;Applicant ID&rdquo;</b> is entered by the Bank Operator at Bank Counter, Instead of Applicant Name.
-		</span>
-		<span class="Notice">
-		<b>Online Transfer: </b>Applicant may also transfer the amount using Internet Banking, Only make sure that the 
-		<b>&ldquo;Applicant ID&rdquo;</b> is mentioned in the transaction remarks.
-		</span>
-		<form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>">
-		<?php if(GetVal($_SESSION, 'Step')!="Print"){?>
+		<?php PE\ShowMsg();
+		if(PE\GetVal($_POST, 'OB')!==NULL)
+			$_SESSION['BlockCode']=PE\GetVal($_POST, 'OB');
+		?>
+		<form action="<?php echo $_SERVER['PHP_SELF'];?>" method="post">
 		<div class="FieldGroup">
-			<h3>Applicant ID:</h3>
-			<input type="text" name="AppID" maxlength="4" />
+			<h3>Office Block:</h3>
+			<select name="OB" id="OB">
+			<?php 
+			$Data=new PE\DB();
+			$Qry='select block_municd,block_muni_nm from '.MySQL_Pre.'Block_muni';
+			$Data->show_sel("block_municd","block_muni_nm",$Qry,PE\GetVal($_SESSION,'BlockCode')); ?>
+			</select>
+			<input type="submit" name="CmdSubmit" value="Show Data"/>
 		</div>
-		<div class="FieldGroup">
-				<h3>Mobile No:</h3>
-				<input type="text" name="AppMobile" maxlength="10" />
-				
-		</div>
-		<?php }?>
-		<input type="submit" value="<?php echo ($_SESSION['Step']!="Print")?"Search":"Print Challan";?>" name="CmdPrint" />
-		<div style="clear:both;"></div>
 		</form>
-		<?php
-		//$Data=new DB();
-		//echo "<br/><p>Count: ".$Data->do_max_query("Select count(*) from ".MySQL_Pre."AppIDs")."</p>";
-		//$Data->do_close();
-		//echo $_SESSION['Step']."<br/>".$_SESSION['Qry'].$_SESSION['PostData']['Fields'];
-		 * 
-		 */
+		<div style="clear:both;"></div>
+		<br/>
+		<?php		
+		PE\ShowData("Select O.off_code,OldOffCode,office,address1,totstaff,count(*) as `Actual Count` from ".MySQL_Pre."office O,".MySQL_Pre."personnel P where O.off_code=P.off_code AND O.blockmuni='".PE\GetVal($_SESSION,'BlockCode')."' Group By O.off_code");
 		?>
 	</div>
 	<div class="pageinfo">
