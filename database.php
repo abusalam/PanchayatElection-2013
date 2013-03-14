@@ -94,7 +94,7 @@ class DB {
 	{
 		$this->do_sel_query($query);
 		$opt=$this->RowCount;
-		if($sel_val=="-- Choose --")
+		if(($sel_val==="-- Choose --") ||($sel_val===""))
 			echo "<option value=''>-- Choose --</option>";
 		for($i=0;$i<$opt;$i++)
 		{

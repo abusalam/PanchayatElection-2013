@@ -16,9 +16,9 @@ if ($action == "LogOut") {
 	$Data->do_ins_query(
 		"INSERT INTO logs (`SessionID`,`IP`,`Referrer`,`UserAgent`,`UserID`,`URL`,`Action`,`Method`,`URI`) values"
 		. "('" . $_SESSION['ID'] . "','" . $_SERVER['REMOTE_ADDR'] . "','" .
-		$Data->SqlSafe($t) . "','" . $_SERVER['HTTP_USER_AGENT'] . "','" . PE\
+		$Data->SqlSafe($_SERVER["HTTP_REFERER"]) . "','" . $_SERVER['HTTP_USER_AGENT'] . "','" . PE\
 		GetVal($_SESSION, 'UserName') . "','" . $Data->SqlSafe($_SERVER[
-		'PHP_SELF']) . "','" . $SessRet . ": (" . $_SERVER['SCRIPT_NAME'] .
+		'PHP_SELF']) . "','" . $action . ": (" . $_SERVER['SCRIPT_NAME'] .
 		")','" . $Data->SqlSafe($_SERVER['REQUEST_METHOD']) . "','" . $Data->
 		SqlSafe($_SERVER['REQUEST_URI']) . "');");
 	session_unset();
@@ -36,7 +36,7 @@ $LogC = 0;
 if ((PE\GetVal($_POST, 'UserID') !== NULL) && (PE\GetVal($_POST, 'UserPass') !==
 	NULL)) {
 	$QueryLogin =
-		"Select PartMapID,UserName from `PE2013_Users` where `UserID`='" .
+		"Select BlockCode,UserName,sdiv_cd from `".MySQL_Pre."Users` U,".MySQL_Pre."Block_muni B where U.BlockCode=B.block_municd AND `UserID`='" .
 		$_POST['UserID'] . "' AND MD5(concat(`UserPass`,MD5('" . $_POST[
 		'LoginToken'] . "')))='" . $_POST['UserPass'] . "'";
 	$rows = $Data->do_sel_query($QueryLogin);
@@ -44,7 +44,8 @@ if ((PE\GetVal($_POST, 'UserID') !== NULL) && (PE\GetVal($_POST, 'UserPass') !==
 		session_regenerate_id();
 		$Row = $Data->get_row();
 		$_SESSION['UserName'] = $Row['UserName'];
-		$_SESSION['PartMapID'] = $Row['PartMapID'];
+		$_SESSION['BlockCode'] = $Row['BlockCode'];
+		$_SESSION['SubDivn'] = $Row['sdiv_cd'];
 		$_SESSION['ID'] = session_id();
 		$_SESSION['FingerPrint'] = md5($_SERVER['REMOTE_ADDR'] . $_SERVER[
 			'HTTP_USER_AGENT'] . "KeyLeft");
@@ -52,11 +53,11 @@ if ((PE\GetVal($_POST, 'UserID') !== NULL) && (PE\GetVal($_POST, 'UserPass') !==
 			'REQUEST_URI'];
 		$action = "JustLoggedIn";
 		$Data->do_ins_query(
-			"Update PE2013_Users Set LoginCount=LoginCount+1 where `UserID`='" .
+			"Update ".MySQL_Pre."Users Set LoginCount=LoginCount+1 where `UserID`='" .
 			$_POST['UserID'] . "' AND MD5(concat(`UserPass`,MD5('" . $_POST[
 			'LoginToken'] . "')))='" . $_POST['UserPass'] . "'");
 		$Data->do_ins_query(
-			"INSERT INTO PE2013_logs (`SessionID`,`IP`,`Referrer`,`UserAgent`,`UserID`,`URL`,`Action`,`Method`,`URI`) values"
+			"INSERT INTO ".MySQL_Pre."logs (`SessionID`,`IP`,`Referrer`,`UserAgent`,`UserID`,`URL`,`Action`,`Method`,`URI`) values"
 			. "('" . $_SESSION['ID'] . "','" . $_SERVER['REMOTE_ADDR'] . "','" .
 			mysql_real_escape_string($_SERVER['HTTP_REFERER']) . "','" .
 			$_SERVER['HTTP_USER_AGENT'] . "','" . $_SESSION['UserName'] . "','"
@@ -67,7 +68,7 @@ if ((PE\GetVal($_POST, 'UserID') !== NULL) && (PE\GetVal($_POST, 'UserPass') !==
 	} else {
 		$action = "NoAccess";
 		$Data->do_ins_query(
-			"INSERT INTO PE2013_logs (`SessionID`,`IP`,`Referrer`,`UserAgent`,`UserID`,`URL`,`Action`,`Method`,`URI`) values"
+			"INSERT INTO ".MySQL_Pre."logs (`SessionID`,`IP`,`Referrer`,`UserAgent`,`UserID`,`URL`,`Action`,`Method`,`URI`) values"
 			. "('" . $_SESSION['ID'] . "','" . $_SERVER['REMOTE_ADDR'] . "','" .
 			mysql_real_escape_string($_SERVER['HTTP_REFERER']) . "','" .
 			$_SERVER['HTTP_USER_AGENT'] . "','" . $_POST['UserID'] . "','" .
@@ -137,10 +138,10 @@ if (($action != "JustLoggedIn") && ($action != "Valid")) {
 <form name="frmLogin" method="post" action="<?php $_SERVER['PHP_SELF']?>">
 	<?php //echo "USERID: ".$_POST['UserID']."<br/>".$_POST['UserPass']."<br />".$UserPass.$QueryLogin.$action; ?>
     <label for="UserID">User ID:</label><br />
-	<input type="text" id="UserID" name="UserID" value="" autocomplete="off"/>
+	<input type="text" id="UserID" name="UserID" value="WBAC21901" autocomplete="off"/>
 <br />
 <label for="UserPass">Password:</label><br />
-<input type="password" id="UserPass" name="UserPass" value="" autocomplete="off"/><br />
+<input type="password" id="UserPass" name="UserPass" value="WBAC21901" autocomplete="off"/><br />
 <input type="hidden" name="LoginToken" value="<?php echo $_SESSION['Token'];?>" />
 <input style="width:80px;" type="submit" value="Login" onClick="document.getElementById('UserPass').value=MD5(MD5(document.getElementById('UserPass').value)+'<?php echo md5($_SESSION['Token']);?>');"/>
 </form>

@@ -82,7 +82,7 @@ body {
 .ShowField {
 	border: 1px Solid;
 	margin: 4px 0px 10px 10px;
-	padding: 0px 4px 4px 4px;
+	padding:4px;
 	background-color: #FFF;
 	display: inline-block;
 }

@@ -3,13 +3,20 @@ namespace PanchayatElection;
 
 require_once('library.php');
 
-function GetVal($Array,$Index){
+function GetVal($Array,$Index,$IsCombo=FALSE){
 	if(!isset($Array[$Index])){
-		return NULL;
+		if ($IsCombo)
+			return "-- Choose --";
+		else
+			return NULL;
 	}
 	else{
-		return $Array[$Index];
+		if ($IsCombo && ($Array[$Index]===NULL))
+			return "-- Choose --";
+		else
+			return $Array[$Index];
 	}
+	
 }
 
 function GetAbsoluteURLFolder()
@@ -25,9 +32,8 @@ function InpSanitize($PostData){
 	foreach ($PostData as $FieldName => &$Value){
 		$Value=$Data->SqlSafe($Value);
 		//$Fields=$Fields."<br />".$FieldName;
-		if(($Value=="") ||(count($PostData)<23)){
+		if($Value==""){
 			$_SESSION['Msg']="<b>Message:</b> Some Fields left unfilled.";
-			$_SESSION['Step']="AppForm";
 		}
 	}
 	unset($Value);
@@ -35,7 +41,9 @@ function InpSanitize($PostData){
 	//echo "Total Fields:".count($PostData);
 	return $PostData;
 }
-
+/*
+ * Shows the content of $_SESSION['Msg']
+ */
 function ShowMsg(){
 	if(GetVal($_SESSION,"Msg")!=""){
 		echo '<span class="Message">'.$_SESSION['Msg'].'</span><br/>';
@@ -112,6 +120,10 @@ function CheckAuth()
     {
         $_SESSION['Debug']="(".$_SESSION['PE2013_TOKEN']."=".$_COOKIE['PE2013_TOKEN'].")";
 		return "INVALID SESSION (".$_SESSION['PE2013_TOKEN']."=".$_COOKIE['PE2013_TOKEN'].")";
+    }
+    elseif ($_SESSION['ID']!==session_id()){
+    	$_SESSION['Debug']="(".$_SESSION['ID']."=".session_id().")";
+    	return "INVALID SESSION (".$_SESSION['ID']."=".session_id().")";
     }
     else
     {                                        
