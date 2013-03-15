@@ -167,8 +167,8 @@ require_once("topmenu.php");
 		<?php 
 		}?>
 	</form>
-	<?php echo "Fields: " . count($_POST); ?>
-	<pre><?php print_r($_POST); ?></pre>
+	<?php// echo "Fields: " . count($_POST); ?>
+	<pre><?php// print_r($_POST); ?></pre>
 </div>
 <div class="pageinfo"><?php PE\pageinfo(); ?></div>
 <div class="footer"><?php PE\footerinfo(); ?></div>

@@ -26,7 +26,7 @@ switch (PE\GetVal($_SESSION,"Step")) {
 			if ($Data->RowCount>0) {
 				$Row=$Data->get_row();
 				$_SESSION['PostData'] = $Row;
-				if ($Row['ActStaff']==$Row['totstaff']){
+				if ($Row['ActStaff']>=$Row['totstaff']){
 					$_SESSION['Step']=NULL;
 					$_SESSION['Msg']=" No more Personnel can be added!";
 				}

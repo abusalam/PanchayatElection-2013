@@ -13,6 +13,17 @@
 			class="<?php echo ($_SERVER['SCRIPT_NAME']==BaseDIR.'Report.php')?'SelMenuitems':'Menuitems';?>">
 			<a href="<?php echo FN\GetAbsoluteURLFolder(); ?>Report.php">Report</a>
 		</li>
+		<?php 
+			if ($_SESSION['UserName']==="Admin") {
+				?>
+				<li 
+					class="<?php echo ($_SERVER['SCRIPT_NAME']==BaseDIR.'reply.php')?'SelMenuitems':'Menuitems';?>">
+					<a href="<?php echo FN\GetAbsoluteURLFolder(); ?>reply.php">Reply Helpline</a>
+				</li>
+				<?php 
+			}
+		?>	
+		
 		<li
 			class="<?php echo ($_SERVER['SCRIPT_NAME']==BaseDIR.'Helpline.php')?'SelMenuitems':'Menuitems';?>">
 			<a href="<?php echo FN\GetAbsoluteURLFolder(); ?>Helpline.php">Helpline</a>

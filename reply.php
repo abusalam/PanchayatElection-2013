@@ -1,12 +1,9 @@
-<?php 
+<?php
 use PanchayatElection as PE;
 require_once('functions.php');
-initpage();
+PE\srer_auth();
+PE\HtmlHeader("Reply Helpline");
 ?>
-<head>
-<meta name="robots" content="noarchive">
-<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-<title>Reply Helpline - Paschim Medinipur</title>
 <style type="text/css" media="all" title="CSS By Abu Salam Parvez Alam">
 <!--
 @import url("css/Style.css");
@@ -26,13 +23,13 @@ initpage();
 	require_once("topmenu.php");
 	?>
 	<div class="content">
-		<h2>Helpline Reply Queries:</h2>
+		<h2>Reply Helpline Queries:</h2>
 			<?php
 			//$NewCURL=new cURL();
 			//$_SESSION['Msg']=$NewCURL->get("http://recruitment.paschimmedinipur.org/test.php");
-			ShowMsg();
-			$Data=new DB();
-			if($_REQUEST['AdminUpload']=='1')
+			PE\ShowMsg();
+			$Data=new PE\DB();
+			if($_SESSION['UserName']==="Admin")
 			{
 				?>
 			<form name="frmLogin" method="post"
@@ -63,7 +60,7 @@ initpage();
 					//$_SESSION['Msg']=$NewCURL->get("http://recruitment.paschimmedinipur.org/MyPHPMailer.php?AppName=".$PostData['AppName']."&AppEmail=".$PostData['AppEmail']."&Subject=".$PostData['Subject']."&Body=".$PostData['Body']);
 					//$_SESSION['Msg']=$_SESSION['Msg'].' Curl: '. function_exists('curl_version') ? 'Enabled' : 'Disabled';
 					
-					ShowMsg();
+					PE\ShowMsg();
 				}
 				$Data->do_sel_query("Select * from ".MySQL_Pre."Helpline Where Replied!=1 Order by Replied,HelpID DESC");
 			}
@@ -82,15 +79,14 @@ initpage();
 				</p>
 				<small><i><?php echo "[".$row['AppEmail']."] Replied On: ".date("l d F Y g:i:s A",strtotime($row['ReplyTime']));?></i></small>
 			</div>
-			 
 	<?php 
 			} ?>
 	</div>
 	<div class="pageinfo">
-		<?php pageinfo(); ?>
+		<?php PE\pageinfo(); ?>
 	</div>
 	<div class="footer">
-		<?php footerinfo();?>
+		<?php PE\footerinfo();?>
 	</div>
 </body>
 </html>
