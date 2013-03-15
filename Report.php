@@ -53,25 +53,34 @@ $(function() {
 			<?php 
 			$Data=new PE\DB();
 			$Qry="select off_code,office from ".MySQL_Pre."office where blockmuni='".PE\GetVal($_SESSION,'BlockCode')."'";
-			$Data->show_sel("off_code","office",$Qry,PE\GetVal($_SESSION,'BlockCode')); ?>
+			$Data->show_sel("off_code","office",$Qry,PE\GetVal($_POST,'off_code')); ?>
 			</select>
-			<input type="submit" name="CmdSubmit" value="Show Data"/>
+			<input type="submit" name="CmdSubmit" value="Show Data"/><input type="submit" name="CmdSubmit" value="Show Deleted Data"/>
 		</div>
 		</form>
 		<div style="clear:both;"></div>
 		<br/>
 		<?php
+		if(PE\GetVal($_POST,'CmdSubmit')==="Show Data"){
+			$ShowDelete=" AND NOT Deleted";
+		}
+		else {
+			$ShowDelete=" AND Deleted";
+		}
+			
 		if(PE\GetVal($_POST,'off_code')){
 		$Qry="Select OldPerCode,P.per_code,P.officer_nm,DATE_FORMAT(date_ob,'%d/%m/%Y') as date_ob,present_ad1,pay,description,epic,"
 				. " P.mobile,rem_desc,assembly_temp,assembly_off,HB "
 				. " from ".MySQL_Pre."office O INNER JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) "
 				. " INNER JOIN ".MySQL_Pre."scale S ON (S.scalecode=P.scalecode) "
 				. " INNER JOIN ".MySQL_Pre."remarks R ON (R.remarks=P.remarks) "
-				. " where O.blockmuni='".PE\GetVal($_SESSION,'BlockCode')."' AND P.off_code='".PE\GetVal($_POST,'off_code')."' AND NOT Deleted";
+				. " where O.blockmuni='".PE\GetVal($_SESSION,'BlockCode')."' AND P.off_code='".PE\GetVal($_POST,'off_code')."' ".$ShowDelete;
 		PE\ShowData($Qry);
 		}
 		else {
-		PE\ShowData("Select O.off_code,OldOffCode,office,address1,totstaff,count(*) as `Actual Count` from ".MySQL_Pre."office O,".MySQL_Pre."personnel P where O.off_code=P.off_code AND O.blockmuni='".PE\GetVal($_SESSION,'BlockCode')."' AND NOT Deleted Group By O.off_code");
+		PE\ShowData("Select O.off_code,OldOffCode,office,address1,totstaff,count(*) as `Actual Count` "
+				. " from ".MySQL_Pre."office O INNER JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) "
+				. " Where O.blockmuni='" . PE\GetVal($_SESSION,'BlockCode') . "' Group By O.off_code");
 		}
 		?>
 	</div>

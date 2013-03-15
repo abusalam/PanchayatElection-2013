@@ -17,6 +17,10 @@
 			if ($_SESSION['UserName']==="Admin") {
 				?>
 				<li 
+					class="<?php echo ($_SERVER['SCRIPT_NAME']==BaseDIR.'AdminQuery.php')?'SelMenuitems':'Menuitems';?>">
+					<a href="<?php echo FN\GetAbsoluteURLFolder(); ?>AdminQuery.php">District Admin Query</a>
+				</li>
+				<li 
 					class="<?php echo ($_SERVER['SCRIPT_NAME']==BaseDIR.'reply.php')?'SelMenuitems':'Menuitems';?>">
 					<a href="<?php echo FN\GetAbsoluteURLFolder(); ?>reply.php">Reply Helpline</a>
 				</li>

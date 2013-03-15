@@ -124,7 +124,7 @@ switch ($action) {
 			" You Have Successfully Logged In!</h2>";
 		break;
 	case "Valid":
-		echo "<h2 align=\"center\">You are already Logged In!</h2>";
+		echo "<h2 align=\"center\">You are already Logged In as {$_SESSION['UserName']}!</h2>";
 		break;
 	case "NoAccess":
 		echo "<h2 align=\"center\">Sorry! Access Denied!</h2>";

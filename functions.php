@@ -4,6 +4,7 @@ namespace PanchayatElection;
 require_once('library.php');
 
 function GetVal($Array,$Index,$IsCombo=FALSE){
+	$Data=new DB();
 	if(!isset($Array[$Index])){
 		if ($IsCombo)
 			return "-- Choose --";
@@ -14,7 +15,7 @@ function GetVal($Array,$Index,$IsCombo=FALSE){
 		if ($IsCombo && ($Array[$Index]===NULL))
 			return "-- Choose --";
 		else
-			return $Array[$Index];
+			return $Data->SqlSafe($Array[$Index]);
 	}
 	
 }
@@ -133,7 +134,8 @@ function CheckAuth()
 
 function srer_auth()
 {
-	session_start();
+	if (! isset($_SESSION))
+		session_start();
 	$_SESSION['Debug']=GetVal($_SESSION,'Debug')."InPE2013_AUTH";
 	$SessRet=CheckAuth();
 	$reg=new DB();
