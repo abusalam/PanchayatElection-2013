@@ -68,63 +68,72 @@ require_once("topmenu.php");
 	<label for="U"><input type="submit" id="U" name="CmdMode" value="Update Existing Personnel" /></label>
 	</form>
 	<form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>" 
-			<?php echo (PE\GetVal($_SESSION,'Step')!==NULL)?'':'style="display:none;"';?>>
+			<?php echo (PE\GetVal($_SESSION,'Step')!==NULL)?'':'style="display:none;"'; ?>
 	<hr />
 	<?php if (PE\GetVal($_SESSION, 'Step') === "A") { ?>
-		<div class="FieldLabel">Office Code:</div>
+		<div class="FieldLabel"><?php echo PE\GetColHead('off_code'); ?>:</div>
 		<span class="ShowField"><?php echo $_SESSION['SubDivn']; ?>
 		<input type="text" name="off_code" size="3" maxlength="4" style="border: none;" 
-				value="<?php echo substr(PE\GetVal($_SESSION['PostData'],'off_code'),-4);?>" /></span>
+				value="<?php echo substr(PE\GetVal($_SESSION['PostData'],'off_code'),-4); ?>" /></span>
 		<?php } else { ?>
-		<div class="FieldLabel">Personnel Code:</div>
+		<div class="FieldLabel"><?php echo PE\GetColHead('per_code'); ?>:</div>
 		<span class="ShowField"><?php echo $_SESSION['SubDivn']; ?>
 		<input type="text" name="per_code" size="3" maxlength="5" style="border: none;" 
 				value="<?php echo substr(PE\GetVal($_SESSION['PostData'],'per_code'),-5);?>" /></span>
 		<?php } ?>
 		<input type="submit" name="AppSubmit" value="Show" />
-		<span class="Notice"><b>Office Name:</b><?php echo PE\GetVal($_SESSION['PostData'],'office');?></span>
+		<span class="Notice"><b>Office Name:</b><?php echo PE\GetVal($_SESSION['PostData'],'office'); ?></span>
 		<hr />
 		<div class="FieldGroup">
-			<h3>Home Block:</h3>
+			<h3><?php echo PE\GetColHead('HB'); ?>:</h3>
 			<select name="HB">
-			<?php $Data->show_sel("block_municd", "block_muni_nm","select block_municd,block_muni_nm "
+			<?php 
+			$Data->show_sel("block_municd", "block_muni_nm","select block_municd,block_muni_nm "
 								. "from " . MySQL_Pre . "Block_muni", PE\GetVal($_SESSION['PostData'], 'HB',TRUE));
 			?>
 			</select>
 		</div>		
 		<div class="FieldGroup">
-			<h3>Pay Scale:</h3>
+			<h3><?php echo PE\GetColHead('scalecode'); ?>:</h3>
 			<select name="scalecode">
-			<?php $Data->show_sel("scalecode", "description","select scalecode,description "
+			<?php 
+			$Data->show_sel("scalecode", "description","select scalecode,description "
 								. "from " . MySQL_Pre . "scale", PE\GetVal($_SESSION['PostData'], 'scalecode',TRUE));
 			?>
 			</select>
 		</div>
 		<div class="FieldGroup">
-			<h3>Basic Pay:</h3>
-			<input type="text" name="pay" size="5" maxlength="5" value="<?php echo PE\GetVal($_SESSION['PostData'],'pay');?>" />
+			<h3><?php echo PE\GetColHead('pay'); ?>:</h3>
+			<input type="text" name="pay" size="5" maxlength="5" value="<?php echo PE\GetVal($_SESSION['PostData'],'pay'); ?>" />
 		</div>
 		<div class="FieldGroup">
-			<h3>Date of Birth:</h3>
+			<h3><?php echo PE\GetColHead('date_ob'); ?>:</h3>
 			<input class="datepick" type="text" size="10" name="date_ob" readonly="readonly" 
-					value="<?php echo (PE\GetVal($_SESSION['PostData'],'date_ob')!==NULL)?date("Y-m-d",strtotime(PE\GetVal($_SESSION['PostData'],'date_ob'))):"";?>" />
+					value="<?php echo (PE\GetVal($_SESSION['PostData'],'date_ob')!==NULL)?date("Y-m-d",strtotime(PE\GetVal($_SESSION['PostData'],'date_ob'))):""; ?>" />
 		</div>
 		<div class="FieldGroup">
 		<h3>EPIC:</h3>
-			<input type="text" name="epic" size="12" maxlength="12" value="<?php echo PE\GetVal($_SESSION['PostData'],'epic');?>" />
+			<input type="text" name="epic" size="12" maxlength="12" value="<?php echo PE\GetVal($_SESSION['PostData'],'epic'); ?>" />
 		</div>
 		<div class="FieldGroup">
-			<h3>Mobile No:</h3>
-			<input type="text" name="mobile" size="12" maxlength="10" value="<?php echo PE\GetVal($_SESSION['PostData'],'mobile');?>" />
+			<h3><?php echo PE\GetColHead('mobile'); ?>:</h3>
+			<input type="text" name="mobile" size="12" maxlength="10" value="<?php echo PE\GetVal($_SESSION['PostData'],'mobile'); ?>" />
 		</div>
 		<div style="clear:both;"></div>
 		<hr />
 		<div class="FieldGroup">
-			<h3>Employee Name:</h3>
-			<input type="text" name="officer_nm" size="35" maxlength="50" value="<?php echo PE\GetVal($_SESSION['PostData'],'officer_nm');?>" />
+			<h3><?php echo PE\GetColHead('officer_nm'); ?>:</h3>
+			<input type="text" name="officer_nm" size="35" maxlength="50" value="<?php echo PE\GetVal($_SESSION['PostData'],'officer_nm'); ?>" />
+			<h3><?php echo PE\GetColHead('remarks'); ?>:</h3>
+			<select name="remarks">
+			<?php
+			$Data->show_sel("remarks", "rem_desc","select remarks,rem_desc "
+								. "from " . MySQL_Pre . "remarks", PE\GetVal($_SESSION['PostData'], 'remarks',TRUE));
+			?>
+			</select>
 		</div>
 		<div class="FieldGroup">
-			<h3>Present Assembly:</h3>
+			<h3><?php echo PE\GetColHead('assembly_temp'); ?>:</h3>
 			<select name="assembly_temp">
 			<?php $Data->show_sel("assembly_cd", "assembly", "select assembly_cd,assembly "
 									. "from " . MySQL_Pre . "assembly", PE\GetVal($_SESSION['PostData'],'assembly_temp',TRUE));
@@ -132,7 +141,7 @@ require_once("topmenu.php");
 			</select>
 		</div>
 		<div class="FieldGroup">
-			<h3>Office Assembly:</h3>
+			<h3><?php echo PE\GetColHead('assembly_off'); ?>:</h3>
 			<select name="assembly_off">
 			<?php $Data->show_sel("assembly_cd", "assembly", "select assembly_cd,assembly "
 									. "from " . MySQL_Pre . "assembly", PE\GetVal($_SESSION['PostData'],'assembly_off',TRUE));
@@ -140,8 +149,8 @@ require_once("topmenu.php");
 			</select>
 		</div>
 		<div class="FieldGroup">
-			<h3>Present Address:</h3>
-				<textarea rows="5" cols="30" name="present_ad1" maxlength="100"><?php echo PE\GetVal($_SESSION['PostData'],'present_ad1');?></textarea>
+			<h3><?php echo PE\GetColHead('present_ad1'); ?>:</h3>
+				<textarea rows="5" cols="30" name="present_ad1" maxlength="100"><?php echo PE\GetVal($_SESSION['PostData'],'present_ad1'); ?></textarea>
 		</div>
 		<div style="clear:both;"></div><hr />
 		<?php 

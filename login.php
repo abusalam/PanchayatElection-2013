@@ -38,7 +38,7 @@ if ((PE\GetVal($_POST, 'UserID') !== NULL) && (PE\GetVal($_POST, 'UserPass') !==
 	$QueryLogin =
 		"Select BlockCode,UserName,sdiv_cd from `".MySQL_Pre."Users` U,".MySQL_Pre."Block_muni B where U.BlockCode=B.block_municd AND `UserID`='" .
 		$_POST['UserID'] . "' AND MD5(concat(`UserPass`,MD5('" . $_POST[
-		'LoginToken'] . "')))='" . $_POST['UserPass'] . "'";
+		'LoginToken'] . "')))='" . $_POST['UserPass'] . "' AND Activated";
 	$rows = $Data->do_sel_query($QueryLogin);
 	if ($rows > 0) {
 		session_regenerate_id();
@@ -138,14 +138,14 @@ if (($action != "JustLoggedIn") && ($action != "Valid")) {
 <form name="frmLogin" method="post" action="<?php $_SERVER['PHP_SELF']?>">
 	<?php //echo "USERID: ".$_POST['UserID']."<br/>".$_POST['UserPass']."<br />".$UserPass.$QueryLogin.$action; ?>
     <label for="UserID">User ID:</label><br />
-	<input type="text" id="UserID" name="UserID" value="WBAC21901" autocomplete="off"/>
+	<input type="text" id="UserID" name="UserID" autocomplete="off"/>
 <br />
 <label for="UserPass">Password:</label><br />
-<input type="password" id="UserPass" name="UserPass" value="WBAC21901" autocomplete="off"/><br />
+<input type="password" id="UserPass" name="UserPass" autocomplete="off"/><br />
 <input type="hidden" name="LoginToken" value="<?php echo $_SESSION['Token'];?>" />
 <input style="width:80px;" type="submit" value="Login" onClick="document.getElementById('UserPass').value=MD5(MD5(document.getElementById('UserPass').value)+'<?php echo md5($_SESSION['Token']);?>');"/>
 </form>
-<p><b>Note:</b>Contact System Manager on (9647182926) for User ID and Password.</p>
+<p><b>Register: </b><a href="Register.php">Click here</a> to register yourself</p>
 <?php
 	//echo $_SESSION['Debug'];
 }
