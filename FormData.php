@@ -26,12 +26,32 @@ switch (PE\GetVal($_SESSION,"Step")) {
 			if ($Data->RowCount>0) {
 				$Row=$Data->get_row();
 				$_SESSION['PostData'] = $Row;
+				if ($Row['ActStaff']==$Row['totstaff']){
+					$_SESSION['Step']=NULL;
+					$_SESSION['Msg']=" No more Personnel can be added!";
+				}
 			}
 			else{
-				//$_SESSION['Msg']=$Qry;
+				$_SESSION['Msg']=" Office Not Found!";
 			}
 		}
-		$Data->do_ins_query("Insert Into " . MySQL_Pre . "personnel ");
+		
+		if (PE\GetVal($_POST, 'AppSubmit') === "Save"){
+			$Data->do_ins_query("Insert Into " . MySQL_Pre . "personnel(`off_code`, `officer_nm`, `present_ad1`, `date_ob`,"
+				." `scalecode`, `pay`, `epic`, `assembly_temp`, `assembly_off`, `mobile`, `remarks`, `HB`, `BlockCode`)"
+				." VALUES ('{$_SESSION['SubDivn']}{$_SESSION['PostData']['off_code']}','{$_SESSION['PostData']['officer_nm']}','{$_SESSION['PostData']['present_ad1']}',"
+				."'{$_SESSION['PostData']['date_ob']}','{$_SESSION['PostData']['scalecode']}',{$_SESSION['PostData']['pay']},"
+				."'{$_SESSION['PostData']['epic']}','{$_SESSION['PostData']['assembly_temp']}','{$_SESSION['PostData']['assembly_off']}',"
+				."{$_SESSION['PostData']['mobile']},'{$_SESSION['PostData']['remarks']}','{$_SESSION['PostData']['HB']}','{$_SESSION['BlockCode']}')");
+			if ($Data->RowCount>0) {
+				$Data->do_ins_query("Update " . MySQL_Pre . "personnel SET OldPerCode=CONCAT('{$_SESSION['SubDivn']}',`PersSL`),"
+							. "per_code=CONCAT('{$_SESSION['SubDivn']}',`PersSL`) Where OldPerCode IS NULL");
+				$_SESSION["PostData"] = array();
+				$_SESSION['Msg']="Personnel Added Successfully!";
+			}
+			else
+				$_SESSION['Msg']="Unable to Insert!";
+		}
 		break;
 	case 'U':
 		if (PE\GetVal($_POST, 'AppSubmit') === "Save and Show Next"){
@@ -46,13 +66,21 @@ switch (PE\GetVal($_SESSION,"Step")) {
 					. "scalecode='{$_SESSION['PostData']['scalecode']}',officer_nm='{$_SESSION['PostData']['officer_nm']}'"
 					. " Where per_code='{$_SESSION['SubDivn']}".PE\GetVal($_POST, 'per_code')."'";
 			$Data->do_ins_query($Qry);
-			//$_SESSION['Msg']="Updated".$Qry;
-			$_SESSION["PostData"] = array();
+			if ($Data->RowCount>0){
+				$_SESSION['Msg']="Personnel Updated Successfully!";
+				$_SESSION["PostData"] = array();
+			}
+			else
+				$_SESSION['Msg']="Unable to Update!";
 		}elseif (PE\GetVal($_POST, 'AppSubmit') === "Delete"){
 			$Qry="Update " . MySQL_Pre . "personnel set Deleted=1 Where per_code='{$_SESSION['SubDivn']}".PE\GetVal($_POST, 'per_code')."'";
 			$Data->do_ins_query($Qry);
-			//$_SESSION['Msg']="Deleted".$Qry;
-			$_SESSION["PostData"] = array();
+			if ($Data->RowCount>0){
+				$_SESSION['Msg']="Personnel Deleted Successfully!";
+				$_SESSION["PostData"] = array();
+			}
+			else
+				$_SESSION['Msg']="Unable to Delete!";
 			
 		}
 		
@@ -66,7 +94,7 @@ switch (PE\GetVal($_SESSION,"Step")) {
 				$_SESSION['PostData'] = $Row;
 			}
 			else {
-				//$_SESSION['Msg']=$Qry;
+				$_SESSION['Msg']=" Personnel Not Found!";
 			}
 		} else
 		if (PE\GetVal($_POST, 'AppSubmit') === "Save") {

@@ -68,7 +68,7 @@ require_once("topmenu.php");
 	<label for="U"><input type="submit" id="U" name="CmdMode" value="Update Existing Personnel" /></label>
 	</form>
 	<form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']);?>" 
-			<?php echo (PE\GetVal($_SESSION,'Step')!==NULL)?'':'style="display:none;"'; ?>
+			<?php echo (PE\GetVal($_SESSION,'Step')!==NULL)?'':'style="display:none;"'; ?>>
 	<hr />
 	<?php if (PE\GetVal($_SESSION, 'Step') === "A") { ?>
 		<div class="FieldLabel"><?php echo PE\GetColHead('off_code'); ?>:</div>
