@@ -20,8 +20,8 @@ switch (PE\GetVal($_SESSION,"Step")) {
 	case 'A':
 		if (PE\GetVal($_POST, 'AppSubmit') === "Show") {
 			$Qry="Select O.off_code,office,address1,totstaff,OldOffCode,count(*) as `ActStaff` " .
-					"from " . MySQL_Pre . "office O INNER JOIN " . MySQL_Pre . "personnel P ON (O.off_code=P.off_code)" .
-					"where blockmuni='{$_SESSION['BlockCode']}' AND OldOffCode='{$_SESSION['SubDivn']}".PE\GetVal($_POST, 'off_code')."' AND NOT Deleted Group by office";
+					"from " . MySQL_Pre . "office O LEFT JOIN (Select * from " . MySQL_Pre . "personnel Where NOT Deleted) P ON (O.off_code=P.off_code) " .
+					"where blockmuni='{$_SESSION['BlockCode']}' AND OldOffCode='{$_SESSION['SubDivn']}".PE\GetVal($_POST, 'off_code')."' Group by office";
 			$Data->do_sel_query($Qry);
 			if ($Data->RowCount>0) {
 				$Row=$Data->get_row();
@@ -32,7 +32,7 @@ switch (PE\GetVal($_SESSION,"Step")) {
 				}
 			}
 			else{
-				$_SESSION['Msg']=" Office Not Found!";
+				$_SESSION['Msg']=" Office Not Found! ".$Qry;
 			}
 		}
 		
@@ -86,7 +86,7 @@ switch (PE\GetVal($_SESSION,"Step")) {
 		
 		if (PE\GetVal($_POST, 'AppSubmit') === "Show") {
 			$Qry="Select HB,per_code,office,P.officer_nm,date_ob,pay,scalecode,present_ad1,remarks,P.mobile,epic,assembly_temp,assembly_off " .
-					"from " . MySQL_Pre . "office O INNER JOIN " . MySQL_Pre . "personnel P ON (O.off_code=P.off_code)" .
+					"from " . MySQL_Pre . "office O LEFT JOIN " . MySQL_Pre . "personnel P ON (O.off_code=P.off_code)" .
 					" where  blockmuni='{$_SESSION['BlockCode']}' AND OldPerCode='{$_SESSION['SubDivn']}".PE\GetVal($_POST, 'per_code')."' AND NOT Deleted";
 			$Data->do_sel_query($Qry);
 			if ($Data->RowCount>0) {

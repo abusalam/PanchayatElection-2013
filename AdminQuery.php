@@ -90,10 +90,10 @@ $(function() {
 			case ((PE\GetVal($_POST,'off_code')) && (PE\GetVal($_POST,'CmdSubmit')==="Show Data")):
 				$Qry="Select OldPerCode,P.per_code,P.officer_nm,DATE_FORMAT(date_ob,'%d/%m/%Y') as date_ob,present_ad1,pay,description,epic,"
 					. " P.mobile,rem_desc,assembly_temp,assembly_off,HB "
-					. " from ".MySQL_Pre."office O LEFT JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) "
+					. " from ".MySQL_Pre."office O LEFT JOIN (Select * from ".MySQL_Pre."personnel Where {$ShowDelete} Deleted) P ON (O.off_code=P.off_code) "
 					. " LEFT JOIN ".MySQL_Pre."scale S ON (S.scalecode=P.scalecode) "
 					. " LEFT JOIN ".MySQL_Pre."remarks R ON (R.remarks=P.remarks) "
-					. " where O.blockmuni='".PE\GetVal($_POST,'BlockCode')."' AND P.off_code='".PE\GetVal($_POST,'off_code')."' AND {$ShowDelete} Deleted";
+					. " where O.blockmuni='".PE\GetVal($_POST,'BlockCode')."' AND P.off_code='".PE\GetVal($_POST,'off_code')."'";
 				echo "<B>Office: </b>" . $Data->do_max_query("Select CONCAT('[',off_code,'] - [',OldOffCode,'] - [',office,'] - [',address1,'] - [',totstaff,']') "
 					. "from ".MySQL_Pre."office Where off_code='".PE\GetVal($_POST,'off_code')."'")."<br/>";
 				PE\ShowData($Qry);
@@ -109,8 +109,8 @@ $(function() {
 				break;
 			case (PE\GetVal($_POST,'CmdSubmit')==="Show Office"):
 				$Qry="Select O.off_code,OldOffCode,office,address1,totstaff,count(per_code) as `Actual Count` "
-					. " from ".MySQL_Pre."office O LEFT JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) "
-					. "Where O.blockmuni='" . PE\GetVal($_POST,'BlockCode') . "' AND {$ShowDelete} Deleted Group By O.off_code";
+					. " from ".MySQL_Pre."office O LEFT JOIN (Select * from ".MySQL_Pre."personnel Where {$ShowDelete} Deleted) P ON (O.off_code=P.off_code) "
+					. "Where O.blockmuni='" . PE\GetVal($_POST,'BlockCode') . "' Group By O.off_code";
 				PE\ShowData($Qry);
 				break;
 			case (PE\GetVal($_POST,'CmdQuery')==="Block wise Personnel Count"):
