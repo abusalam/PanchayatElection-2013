@@ -21,14 +21,14 @@ switch (PE\GetVal($_SESSION,"Step")) {
 		if (PE\GetVal($_POST, 'AppSubmit') === "Show") {
 			$Qry="Select O.off_code,office,address1,totstaff,OldOffCode,count(*) as `ActStaff` " .
 					"from " . MySQL_Pre . "office O INNER JOIN " . MySQL_Pre . "personnel P ON (O.off_code=P.off_code)" .
-					"where blockmuni='{$_SESSION['BlockCode']}' AND OldOffCode='{$_SESSION['SubDivn']}".PE\GetVal($_POST, 'off_code')."' AND NOT Deleted";
+					"where blockmuni='{$_SESSION['BlockCode']}' AND OldOffCode='{$_SESSION['SubDivn']}".PE\GetVal($_POST, 'off_code')."' AND NOT Deleted Group by office";
 			$Data->do_sel_query($Qry);
 			if ($Data->RowCount>0) {
 				$Row=$Data->get_row();
 				$_SESSION['PostData'] = $Row;
-				if ($Row['ActStaff']>=$Row['totstaff']){
+				if (($Row['totstaff']-$Row['ActStaff'])<1){
 					$_SESSION['Step']=NULL;
-					$_SESSION['Msg']=" No more Personnel can be added!";
+					$_SESSION['Msg']="Actual Staff: {$Row['ActStaff']} / {$Row['totstaff']} [Total Staff Strength] No more Personnel can be added!";
 				}
 			}
 			else{
