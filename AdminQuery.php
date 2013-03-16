@@ -90,9 +90,9 @@ $(function() {
 			case ((PE\GetVal($_POST,'off_code')) && (PE\GetVal($_POST,'CmdSubmit')==="Show Data")):
 				$Qry="Select OldPerCode,P.per_code,P.officer_nm,DATE_FORMAT(date_ob,'%d/%m/%Y') as date_ob,present_ad1,pay,description,epic,"
 					. " P.mobile,rem_desc,assembly_temp,assembly_off,HB "
-					. " from ".MySQL_Pre."office O INNER JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) "
-					. " INNER JOIN ".MySQL_Pre."scale S ON (S.scalecode=P.scalecode) "
-					. " INNER JOIN ".MySQL_Pre."remarks R ON (R.remarks=P.remarks) "
+					. " from ".MySQL_Pre."office O LEFT JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) "
+					. " LEFT JOIN ".MySQL_Pre."scale S ON (S.scalecode=P.scalecode) "
+					. " LEFT JOIN ".MySQL_Pre."remarks R ON (R.remarks=P.remarks) "
 					. " where O.blockmuni='".PE\GetVal($_POST,'BlockCode')."' AND P.off_code='".PE\GetVal($_POST,'off_code')."' AND {$ShowDelete} Deleted";
 				echo "<B>Office: </b>" . $Data->do_max_query("Select CONCAT('[',off_code,'] - [',OldOffCode,'] - [',office,'] - [',address1,'] - [',totstaff,']') "
 					. "from ".MySQL_Pre."office Where off_code='".PE\GetVal($_POST,'off_code')."'")."<br/>";
@@ -101,38 +101,38 @@ $(function() {
 			case (PE\GetVal($_POST,'CmdSubmit')==="Show Data"):
 				$Qry="Select OldPerCode,P.per_code,P.officer_nm,DATE_FORMAT(date_ob,'%d/%m/%Y') as date_ob,present_ad1,pay,description,epic,"
 					. " P.mobile,rem_desc,assembly_temp,assembly_off,HB "
-					. " from ".MySQL_Pre."office O INNER JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) "
-					. " INNER JOIN ".MySQL_Pre."scale S ON (S.scalecode=P.scalecode) "
-					. " INNER JOIN ".MySQL_Pre."remarks R ON (R.remarks=P.remarks) "
+					. " from ".MySQL_Pre."office O LEFT JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) "
+					. " LEFT JOIN ".MySQL_Pre."scale S ON (S.scalecode=P.scalecode) "
+					. " LEFT JOIN ".MySQL_Pre."remarks R ON (R.remarks=P.remarks) "
 					. " where O.blockmuni='".PE\GetVal($_POST,'BlockCode')."' AND P.off_code='".PE\GetVal($_POST,'off_code')."' AND {$ShowDelete} Deleted";
 				PE\ShowData($Qry);
 				break;
 			case (PE\GetVal($_POST,'CmdSubmit')==="Show Office"):
-				$Qry="Select O.off_code,OldOffCode,office,address1,totstaff,count(*) as `Actual Count` "
-					. " from ".MySQL_Pre."office O INNER JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) "
+				$Qry="Select O.off_code,OldOffCode,office,address1,totstaff,count(per_code) as `Actual Count` "
+					. " from ".MySQL_Pre."office O LEFT JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) "
 					. "Where O.blockmuni='" . PE\GetVal($_POST,'BlockCode') . "' AND {$ShowDelete} Deleted Group By O.off_code";
 				PE\ShowData($Qry);
 				break;
 			case (PE\GetVal($_POST,'CmdQuery')==="Block wise Personnel Count"):
-				$Qry="Select O.blockmuni,B.block_muni_nm,count(*) as `Total Staff` "
-					. " from ".MySQL_Pre."office O INNER JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code)"
-					. " INNER JOIN ".MySQL_Pre."Block_muni B ON (B.block_municd=O.blockmuni) Where {$ShowDelete} Deleted Group By O.blockmuni";
+				$Qry="Select O.blockmuni,B.block_muni_nm,count(per_code) as `Total Staff` "
+					. " from ".MySQL_Pre."office O LEFT JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code)"
+					. " LEFT JOIN ".MySQL_Pre."Block_muni B ON (B.block_municd=O.blockmuni) Where {$ShowDelete} Deleted Group By O.blockmuni";
 				PE\ShowData($Qry);
 				break;
 			case (PE\GetVal($_POST,'CmdQuery')==="Block wise Office Count"):
 				$Qry="Select O.blockmuni,B.block_muni_nm,count(DISTINCT O.off_code) as `Total Staff` "
-					. " from ".MySQL_Pre."office O INNER JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code)"
-					. " INNER JOIN ".MySQL_Pre."Block_muni B ON (B.block_municd=O.blockmuni) Where {$ShowDelete} Deleted Group By O.blockmuni";
+					. " from ".MySQL_Pre."office O LEFT JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code)"
+					. " LEFT JOIN ".MySQL_Pre."Block_muni B ON (B.block_municd=O.blockmuni) Where {$ShowDelete} Deleted Group By O.blockmuni";
 				PE\ShowData($Qry);
 				break;
 			case (PE\GetVal($_POST,'CmdQuery')==="Total Personnel Count"):
-				$Qry="Select count(*) as `Total Staff` "
+				$Qry="Select count(per_code) as `Total Staff` "
 					. " from ".MySQL_Pre."personnel Where {$ShowDelete} Deleted";
 				echo "<p>Total Personnel: ".$Data->do_max_query($Qry)."</p>";
 				break;
 			case (PE\GetVal($_POST,'CmdQuery')==="Office Count"):
 				$Qry="Select count(distinct O.off_code) "
-					. "  from ".MySQL_Pre."office O INNER JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) Where {$ShowDelete} Deleted";
+					. "  from ".MySQL_Pre."office O LEFT JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) Where {$ShowDelete} Deleted";
 				echo "<p>Total Offices having at least one personnel: ".$Data->do_max_query($Qry)."</p>";
 				break;
 			case (PE\GetVal($_POST,'CmdQuery')==="Total Office"):

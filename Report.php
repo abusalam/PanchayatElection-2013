@@ -76,9 +76,9 @@ $(function() {
 		if(PE\GetVal($_POST,'off_code')){
 		$Qry="Select OldPerCode,P.per_code,P.officer_nm,DATE_FORMAT(date_ob,'%d/%m/%Y') as date_ob,present_ad1,pay,description,epic,"
 				. " P.mobile,rem_desc,assembly_temp,assembly_off,HB "
-				. " from ".MySQL_Pre."office O INNER JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) "
-				. " INNER JOIN ".MySQL_Pre."scale S ON (S.scalecode=P.scalecode) "
-				. " INNER JOIN ".MySQL_Pre."remarks R ON (R.remarks=P.remarks) "
+				. " from ".MySQL_Pre."office O LEFT JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) "
+				. " LEFT JOIN ".MySQL_Pre."scale S ON (S.scalecode=P.scalecode) "
+				. " LEFT JOIN ".MySQL_Pre."remarks R ON (R.remarks=P.remarks) "
 				. " where O.blockmuni='".PE\GetVal($_SESSION,'BlockCode')."' AND P.off_code='".PE\GetVal($_POST,'off_code')."' ".$ShowDelete;
 		echo "<B>Office: </b>"
 				. $Data->do_max_query("Select CONCAT('[',off_code,'] - [',OldOffCode,'] - [',office,'] - [',address1,'] - [',totstaff,']') "
@@ -86,8 +86,8 @@ $(function() {
 		PE\ShowData($Qry);
 		}
 		else {
-		PE\ShowData("Select O.off_code,OldOffCode,office,address1,totstaff,count(*) as `Actual Count` "
-				. " from ".MySQL_Pre."office O INNER JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) "
+		PE\ShowData("Select O.off_code,OldOffCode,office,address1,totstaff,count(per_code) as `Actual Count` "
+				. " from ".MySQL_Pre."office O LEFT JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) "
 				. " Where O.blockmuni='" . PE\GetVal($_SESSION,'BlockCode') . "' Group By O.off_code");
 		}
 		?>
