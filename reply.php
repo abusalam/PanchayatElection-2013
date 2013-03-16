@@ -1,4 +1,5 @@
 <?php
+//ini_set('display_errors','On');
 use PanchayatElection as PE;
 require_once('functions.php');
 PE\srer_auth();
@@ -39,12 +40,13 @@ PE\HtmlHeader("Reply Helpline");
 					$Query="SELECT HelpID,CONCAT('[',Replied,'] ',AppName) as `AppName` FROM ".MySQL_Pre."Helpline order by Replied,HelpID desc";
 					$Data->show_sel("HelpID","AppName",$Query,$_POST['ReplyTo']);
 					?>
-				</select> <b>Show in FAQ:</b><input type="radio" id="ShowFAQ"
-					name="ShowFAQ" value="1" /><label for="ShowFAQ">Yes</label> <input
-					type="radio" id="ShowFAQ" name="ShowFAQ" value="2" /><label
-					for="ShowFAQ">No</label><br /> <label for="ReplyTxt">Reply:</label><br />
-				<textarea id="ReplyTxt" name="ReplyTxt" rows="4" cols="80"
-					maxlength="300"></textarea>
+				</select>
+				<b>Show in FAQ:</b>
+				<input type="radio" id="RadYes" name="ShowFAQ" value="1" /><label for="RadYes">Yes</label> 
+				<input type="radio" id="RadNo" name="ShowFAQ" value="2" /><label for="RadNo">No</label>
+				<input type="radio" id="RadIgnore" name="ShowFAQ" value="3" /><label for="RadIgnore">Ignore</label><br /> 
+				<label for="ReplyTxt">Reply:</label><br />
+				<textarea id="ReplyTxt" name="ReplyTxt" rows="4" cols="80" maxlength="300"></textarea>
 				<input style="width: 80px;" type="submit" value="Reply" />
 			</form>
 			<?php
@@ -54,15 +56,18 @@ PE\HtmlHeader("Reply Helpline");
 					$Data->do_ins_query($Query);
 					$Data->do_sel_query("Select AppName,AppEmail,TxtQry,ReplyTxt from ".MySQL_Pre."Helpline Where HelpID=".$Data->SqlSafe($_POST['ReplyTo']));
 					$PostData=$Data->get_row();
-					$PostData['Subject']="Helpline Reply from Paschim Medinipur Judgeship";
-					$PostData['Body']=HelplineReply($PostData['AppName'], $PostData['TxtQry'], $PostData['ReplyTxt']);
-					
-					//$_SESSION['Msg']=$NewCURL->get("http://recruitment.paschimmedinipur.org/MyPHPMailer.php?AppName=".$PostData['AppName']."&AppEmail=".$PostData['AppEmail']."&Subject=".$PostData['Subject']."&Body=".$PostData['Body']);
-					//$_SESSION['Msg']=$_SESSION['Msg'].' Curl: '. function_exists('curl_version') ? 'Enabled' : 'Disabled';
-					
+					/*
+					 * For Sending e-Mail when replied
+					 * 
+					 * $PostData['Subject']="Helpline Reply from ".AppTitle;
+					 * $PostData['Body']=PE\HelplineReply($PostData['AppName'], $PostData['TxtQry'], $PostData['ReplyTxt']);
+					 * $_SESSION['Msg']=$NewCURL->get("http://recruitment.paschimmedinipur.org/MyPHPMailer.php?AppName=".$PostData['AppName']."&AppEmail=".$PostData['AppEmail']."&Subject=".$PostData['Subject']."&Body=".$PostData['Body']);
+					 * $_SESSION['Msg']=$_SESSION['Msg'].' Curl: '. function_exists('curl_version') ? 'Enabled' : 'Disabled';
+					 * 
+					 */					
 					PE\ShowMsg();
 				}
-				$Data->do_sel_query("Select * from ".MySQL_Pre."Helpline Where Replied!=1 Order by Replied,HelpID DESC");
+				$Data->do_sel_query("Select * from ".MySQL_Pre."Helpline Where Replied!=1 AND Replied!=3 Order by Replied,HelpID DESC");
 			}
 			else
 				$Data->do_sel_query("Select * from ".MySQL_Pre."Helpline where Replied<2 Order by HelpID DESC");

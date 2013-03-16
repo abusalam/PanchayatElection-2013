@@ -370,4 +370,8 @@ function HtmlHeader($PageTitle="Paschim Medinipur"){
 	echo '<meta name="robots" content="noarchive,noodp">';
 	echo '<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />';
 }
+function HelplineReply($AppName, $TxtQry, $ReplyTxt) {
+	$Body = '<h2>' . AppTitle . '</h2><div>' . '<b>Your Query:</b><br/>' . str_replace("\r\n", "<br />", $TxtQry) . '<br/><br/>' . '<b>Reply:</b>' . '<p><i>' . str_replace("\r\n", "<br />", $ReplyTxt) . '</i></p>' . '</div>';
+	return $Body;
+}
 ?>

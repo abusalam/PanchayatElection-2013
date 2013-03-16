@@ -59,16 +59,15 @@ $(function() {
 			<select name="BlockCode" id="BlockCode">
 			<?php 
 			$Data=new PE\DB();
-			$Qry="select block_municd,block_muni_nm from ".MySQL_Pre."Block_muni";
+			$Qry="select block_municd,CONCAT(block_municd,' - ',block_muni_nm) as block_muni_nm from ".MySQL_Pre."Block_muni";
 			$Data->show_sel("block_municd","block_muni_nm",$Qry,PE\GetVal($_POST,'BlockCode')); ?>
 			</select>
 			<input type="submit" name="CmdSubmit" value="Show Office"/>
 			<h3>Office Code:</h3>
 			<select name="off_code" id="off_code">
 			<?php 
-			$Data=new PE\DB();
-			$Qry="select off_code,office from ".MySQL_Pre."office where blockmuni='".PE\GetVal($_POST,'BlockCode')."'";
-			$Data->show_sel("off_code","office",$Qry,PE\GetVal($_SESSION,'off_code')); ?>
+			$Qry="select off_code,CONCAT(off_code,' - ',office) as office from ".MySQL_Pre."office where blockmuni='".PE\GetVal($_POST,'BlockCode')."'";
+			$Data->show_sel("off_code","office",$Qry,PE\GetVal($_POST,'off_code')); ?>
 			</select>
 			<label for="ChkShow"><input type="checkbox" name="ChkShow" id="ChkShow" value="NOT" checked="checked"/>Hide Deleted Data</label>
 			<input type="submit" name="CmdSubmit" value="Show Data"/>
@@ -94,7 +93,9 @@ $(function() {
 					. " from ".MySQL_Pre."office O INNER JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) "
 					. " INNER JOIN ".MySQL_Pre."scale S ON (S.scalecode=P.scalecode) "
 					. " INNER JOIN ".MySQL_Pre."remarks R ON (R.remarks=P.remarks) "
-					. " where O.blockmuni='".PE\GetVal($_SESSION,'BlockCode')."' AND P.off_code='".PE\GetVal($_POST,'off_code')."' AND {$ShowDelete} Deleted";
+					. " where O.blockmuni='".PE\GetVal($_POST,'BlockCode')."' AND P.off_code='".PE\GetVal($_POST,'off_code')."' AND {$ShowDelete} Deleted";
+				echo "<B>Office: </b>" . $Data->do_max_query("Select CONCAT('[',off_code,'] - [',OldOffCode,'] - [',office,'] - [',address1,'] - [',totstaff,']') "
+					. "from ".MySQL_Pre."office Where off_code='".PE\GetVal($_POST,'off_code')."'")."<br/>";
 				PE\ShowData($Qry);
 				break;
 			case (PE\GetVal($_POST,'CmdSubmit')==="Show Data"):
@@ -103,7 +104,7 @@ $(function() {
 					. " from ".MySQL_Pre."office O INNER JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) "
 					. " INNER JOIN ".MySQL_Pre."scale S ON (S.scalecode=P.scalecode) "
 					. " INNER JOIN ".MySQL_Pre."remarks R ON (R.remarks=P.remarks) "
-					. " where O.blockmuni='".PE\GetVal($_SESSION,'BlockCode')."' AND P.off_code='".PE\GetVal($_POST,'off_code')."' AND {$ShowDelete} Deleted";
+					. " where O.blockmuni='".PE\GetVal($_POST,'BlockCode')."' AND P.off_code='".PE\GetVal($_POST,'off_code')."' AND {$ShowDelete} Deleted";
 				PE\ShowData($Qry);
 				break;
 			case (PE\GetVal($_POST,'CmdSubmit')==="Show Office"):
