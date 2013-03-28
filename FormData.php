@@ -19,9 +19,9 @@ if ((PE\GetVal($_POST, 'AppSubmit') === "Save")||(PE\GetVal($_POST, 'AppSubmit')
 switch (PE\GetVal($_SESSION,"Step")) {
 	case 'A':
 		if (PE\GetVal($_POST, 'AppSubmit') === "Show") {
-			$Qry="Select O.off_code,office,address1,totstaff,OldOffCode,count(*) as `ActStaff` " .
+			$Qry="Select O.off_code,office,address1,totstaff,OldOffCode,count(per_code) as `ActStaff` " .
 					"from " . MySQL_Pre . "office O LEFT JOIN (Select * from " . MySQL_Pre . "personnel Where NOT Deleted) P ON (O.off_code=P.off_code) " .
-					"where blockmuni='{$_SESSION['BlockCode']}' AND OldOffCode='{$_SESSION['SubDivn']}".PE\GetVal($_POST, 'off_code')."' Group by office";
+					"where blockmuni='{$_SESSION['BlockCode']}' AND O.off_code='{$_SESSION['SubDivn']}".PE\GetVal($_POST, 'off_code')."' Group by office";
 			$Data->do_sel_query($Qry);
 			if ($Data->RowCount>0) {
 				$Row=$Data->get_row();
@@ -32,7 +32,7 @@ switch (PE\GetVal($_SESSION,"Step")) {
 				}
 			}
 			else{
-				$_SESSION['Msg']=" Office Not Found! ".$Qry;
+				$_SESSION['Msg']=" Office Not Found! ";
 			}
 		}
 		
@@ -64,7 +64,7 @@ switch (PE\GetVal($_SESSION,"Step")) {
 					. "pay='{$_SESSION['PostData']['pay']}',mobile='{$_SESSION['PostData']['mobile']}',date_ob='{$_SESSION['PostData']['date_ob']}',"
 					. "remarks='{$_SESSION['PostData']['remarks']}',present_ad1='{$_SESSION['PostData']['present_ad1']}',"
 					. "scalecode='{$_SESSION['PostData']['scalecode']}',officer_nm='{$_SESSION['PostData']['officer_nm']}'"
-					. " Where per_code='{$_SESSION['SubDivn']}".PE\GetVal($_POST, 'per_code')."'";
+					. " Where per_code='{$_SESSION['SubDivn']}".PE\GetVal($_POST, 'per_code')."' AND BlockCode='{$_SESSION['BlockCode']}'";
 			$Data->do_ins_query($Qry);
 			if ($Data->RowCount>0){
 				$_SESSION['Msg']="Personnel Updated Successfully!";
@@ -87,11 +87,14 @@ switch (PE\GetVal($_SESSION,"Step")) {
 		if (PE\GetVal($_POST, 'AppSubmit') === "Show") {
 			$Qry="Select HB,per_code,office,P.officer_nm,date_ob,pay,scalecode,present_ad1,remarks,P.mobile,epic,assembly_temp,assembly_off " .
 					"from " . MySQL_Pre . "office O LEFT JOIN " . MySQL_Pre . "personnel P ON (O.off_code=P.off_code)" .
-					" where  blockmuni='{$_SESSION['BlockCode']}' AND OldPerCode='{$_SESSION['SubDivn']}".PE\GetVal($_POST, 'per_code')."' AND NOT Deleted";
+					" where  P.BlockCode='{$_SESSION['BlockCode']}' AND blockmuni='{$_SESSION['BlockCode']}' AND per_code='{$_SESSION['SubDivn']}".PE\GetVal($_POST, 'per_code')."' AND NOT Deleted";
 			$Data->do_sel_query($Qry);
 			if ($Data->RowCount>0) {
 				$Row=$Data->get_row();
 				$_SESSION['PostData'] = $Row;
+			}
+			elseif ($Data->RowCount>1){
+				$_SESSION['Msg']=" Duplicate Personnel Found!";
 			}
 			else {
 				$_SESSION['Msg']=" Personnel Not Found!";

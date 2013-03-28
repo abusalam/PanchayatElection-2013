@@ -9,7 +9,21 @@ PE\HtmlHeader("Helpline");
 @import url("css/Style.css");
 -->
 </style>
+<link type="text/css" href="css/ui-lightness/jquery-ui-1.10.2.custom.min.css"
+			rel="Stylesheet" />
 <script type="text/JavaScript" src='js/contact.js'></script>
+<script
+	type="text/javascript" src="js/jquery-1.9.1.js"></script>
+<script
+	type="text/javascript" src="js/jquery-ui-1.10.2.custom.min.js"></script>
+<script>
+$(function() {
+    $( "#HelpLineNotes" ).accordion({
+    	heightStyle: "content",
+    	collapsible: true
+    });
+  });
+</script>
 </head>
 <body>
 	<div class="TopPanel">
@@ -45,12 +59,14 @@ PE\HtmlHeader("Helpline");
 			<h2>Frequently Asked Questions:</h2>
 			<?php
 			
-			$Data->do_sel_query("Select * from ".MySQL_Pre."Helpline where Replied=1 order by HelpID desc");
+			$Data->do_sel_query("Select * from ".MySQL_Pre."Helpline where Replied=1 order by ReplyTime DESC,HelpID desc");
+			if($Data->RowCount>0)
+			echo '<div id="HelpLineNotes">';
 			while($row = $Data->get_row())
 			{
 			?>
-				<div class="Notice">
-				<b><?php echo htmlspecialchars($row['AppName']);?>:</b><br/>
+				<h3><?php echo '['.$row['HelpID'].'] '.htmlspecialchars($row['AppName'])." [Replied On: ".date("l d F Y g:i:s A ",strtotime($row['ReplyTime'])).']';?></h3>
+				<div>
 				<?php echo str_replace("\r\n","<br />",$row['TxtQry']); ?><br/>
 					<small><i><?php echo "From IP: {$row['IP']} On: ".date("l d F Y g:i:s A ",strtotime($row['QryTime']));?></i></small>
 				<br/><br/>
@@ -58,6 +74,8 @@ PE\HtmlHeader("Helpline");
 				</div>
 			<?php 
 			}
+			if($Data->RowCount>0)
+			echo '</div>';
 			?>
 		<div style="clear:both;"></div>
 		<?php

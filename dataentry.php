@@ -113,7 +113,7 @@ require_once("topmenu.php");
 		</div>
 		<div class="FieldGroup">
 		<h3>EPIC:</h3>
-			<input type="text" name="epic" size="12" maxlength="12" value="<?php echo PE\GetVal($_SESSION['PostData'],'epic'); ?>" />
+			<input type="text" name="epic" size="20" maxlength="20" value="<?php echo PE\GetVal($_SESSION['PostData'],'epic'); ?>" />
 		</div>
 		<div class="FieldGroup">
 			<h3><?php echo PE\GetColHead('mobile'); ?>:</h3>
@@ -135,16 +135,16 @@ require_once("topmenu.php");
 		<div class="FieldGroup">
 			<h3><?php echo PE\GetColHead('assembly_temp'); ?>:</h3>
 			<select name="assembly_temp">
-			<?php $Data->show_sel("assembly_cd", "assembly", "select assembly_cd,assembly "
-									. "from " . MySQL_Pre . "assembly", PE\GetVal($_SESSION['PostData'],'assembly_temp',TRUE));
+			<?php $Data->show_sel("assembly_cd", "assembly", "select assembly_cd,CONCAT(assembly_cd,' - ',assembly) as assembly "
+									. "from " . MySQL_Pre . "assembly ORDER BY assembly_cd", PE\GetVal($_SESSION['PostData'],'assembly_temp',TRUE));
 			?>
 			</select>
 		</div>
 		<div class="FieldGroup">
 			<h3><?php echo PE\GetColHead('assembly_off'); ?>:</h3>
 			<select name="assembly_off">
-			<?php $Data->show_sel("assembly_cd", "assembly", "select assembly_cd,assembly "
-									. "from " . MySQL_Pre . "assembly", PE\GetVal($_SESSION['PostData'],'assembly_off',TRUE));
+			<?php $Data->show_sel("assembly_cd", "assembly", "select assembly_cd,CONCAT(assembly_cd,' - ',assembly) as assembly "
+									. "from " . MySQL_Pre . "assembly ORDER BY assembly_cd", PE\GetVal($_SESSION['PostData'],'assembly_off',TRUE));
 			?>
 			</select>
 		</div>

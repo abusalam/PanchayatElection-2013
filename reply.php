@@ -37,7 +37,7 @@ PE\HtmlHeader("Reply Helpline");
 				action="<?php $_SERVER['PHP_SELF']?>">
 				<label for="ReplyTo">To:</label> <select name="ReplyTo">
 					<?php 
-					$Query="SELECT HelpID,CONCAT('[',Replied,'] ',AppName) as `AppName` FROM ".MySQL_Pre."Helpline order by Replied,HelpID desc";
+					$Query="SELECT HelpID,CONCAT('[',Replied,'-',HelpID,'] ',AppName) as `AppName` FROM ".MySQL_Pre."Helpline order by Replied,HelpID desc";
 					$Data->show_sel("HelpID","AppName",$Query,$_POST['ReplyTo']);
 					?>
 				</select>
@@ -67,13 +67,13 @@ PE\HtmlHeader("Reply Helpline");
 					 */					
 					PE\ShowMsg();
 				}
-				$Data->do_sel_query("Select * from ".MySQL_Pre."Helpline Where Replied!=1 AND Replied!=3 Order by Replied,HelpID DESC");
+				$Data->do_sel_query("Select * from ".MySQL_Pre."Helpline Where Replied!=1 AND Replied!=3 Order by Replied,HelpID");
 			}
 			else
-				$Data->do_sel_query("Select * from ".MySQL_Pre."Helpline where Replied<2 Order by HelpID DESC");
+				$Data->do_sel_query("Select * from ".MySQL_Pre."Helpline where Replied<2 Order by HelpID");
 			while($row = $Data->get_row()){?>
 			<div class="Notice">
-				<b><?php echo htmlspecialchars($row['AppName']);?>:</b><br />
+				<b><?php echo '['.$row['HelpID'].'] '.htmlspecialchars($row['AppName']);?>:</b><br />
 				<?php echo str_replace("\r\n","<br />",$row['TxtQry']); ?>
 				<br /> <small><i><?php echo "From IP: {$row['IP']} On: ".date("l d F Y g:i:s A ",strtotime($row['QryTime']));?>
 				</i> </small><br/><br/>

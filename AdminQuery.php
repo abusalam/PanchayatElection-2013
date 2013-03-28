@@ -50,12 +50,13 @@ $(function() {
 	<div class="content">
 		<h2>Personnel Report</h2>
 		<?php 
-		if(PE\GetVal($_POST, 'OB')!==NULL)
-			$_SESSION['BlockCode']=PE\GetVal($_POST, 'OB');
+		if(PE\GetVal($_POST, 'off_code')!==NULL){
+			$_SESSION['SubDivn'] = substr(PE\GetVal($_POST, 'off_code'),0,4);
+		}
 		?>
 		<form action="<?php echo $_SERVER['PHP_SELF'];?>" method="post">
 		<div class="FieldGroup">
-			<h3>Block Code:</h3>
+			<h3>Block Code: <?php echo $_SESSION['BlockCode'];?></h3>
 			<select name="BlockCode" id="BlockCode">
 			<?php 
 			$Data=new PE\DB();
@@ -112,6 +113,7 @@ $(function() {
 					. " from ".MySQL_Pre."office O LEFT JOIN (Select * from ".MySQL_Pre."personnel Where {$ShowDelete} Deleted) P ON (O.off_code=P.off_code) "
 					. "Where O.blockmuni='" . PE\GetVal($_POST,'BlockCode') . "' Group By O.off_code";
 				PE\ShowData($Qry);
+				$_SESSION['BlockCode'] = PE\GetVal($_POST,'BlockCode');
 				break;
 			case (PE\GetVal($_POST,'CmdQuery')==="Block wise Personnel Count"):
 				$Qry="Select O.blockmuni,B.block_muni_nm,count(per_code) as `Total Staff` "
