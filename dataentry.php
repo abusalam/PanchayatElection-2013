@@ -78,7 +78,7 @@ require_once("topmenu.php");
 		<?php } else { ?>
 		<div class="FieldLabel"><?php echo PE\GetColHead('per_code'); ?>:</div>
 		<span class="ShowField"><?php echo $_SESSION['SubDivn']; ?>
-		<input type="text" name="per_code" size="3" maxlength="5" style="border: none;" 
+		<input type="text" name="per_code" size="4" maxlength="5" style="border: none;" 
 				value="<?php echo substr(PE\GetVal($_SESSION['PostData'],'per_code'),-5);?>" /></span>
 		<?php } ?>
 		<input type="submit" name="AppSubmit" value="Show" />

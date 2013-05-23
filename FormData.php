@@ -37,6 +37,7 @@ switch (PE\GetVal($_SESSION,"Step")) {
 		}
 		
 		if (PE\GetVal($_POST, 'AppSubmit') === "Save"){
+			if(strlen($_SESSION['PostData']['off_code'])===4)
 			$Data->do_ins_query("Insert Into " . MySQL_Pre . "personnel(`off_code`, `officer_nm`, `present_ad1`, `date_ob`,"
 				." `scalecode`, `pay`, `epic`, `assembly_temp`, `assembly_off`, `mobile`, `remarks`, `HB`, `BlockCode`)"
 				." VALUES ('{$_SESSION['SubDivn']}{$_SESSION['PostData']['off_code']}','{$_SESSION['PostData']['officer_nm']}','{$_SESSION['PostData']['present_ad1']}',"
@@ -44,8 +45,8 @@ switch (PE\GetVal($_SESSION,"Step")) {
 				."'{$_SESSION['PostData']['epic']}','{$_SESSION['PostData']['assembly_temp']}','{$_SESSION['PostData']['assembly_off']}',"
 				."{$_SESSION['PostData']['mobile']},'{$_SESSION['PostData']['remarks']}','{$_SESSION['PostData']['HB']}','{$_SESSION['BlockCode']}')");
 			if ($Data->RowCount>0) {
-				$Data->do_ins_query("Update " . MySQL_Pre . "personnel SET OldPerCode=CONCAT('{$_SESSION['SubDivn']}',`PersSL`),"
-							. "per_code=CONCAT('{$_SESSION['SubDivn']}',`PersSL`) Where OldPerCode IS NULL");
+				$Data->do_ins_query("Update " . MySQL_Pre . "personnel SET per_code=CONCAT('{$_SESSION['SubDivn']}',`PersSL`)"
+							." Where BlockCode='{$_SESSION['BlockCode']}' AND per_code=''");
 				$_SESSION["PostData"] = array();
 				$_SESSION['Msg']="Personnel Added Successfully!";
 			}

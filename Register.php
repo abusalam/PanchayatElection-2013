@@ -32,10 +32,10 @@ PE\HtmlHeader("Register");
 			<form name="feed_frm" method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>" >
 			<div class="FieldGroup">
 				<h3>Block Name:</h3>
-				<select name="UserID">
+				<select name="PartMapID">
 				<?php 
-					$Data->show_sel("UserID", "UserName","select UserID,UserName "
-									. "from " . MySQL_Pre . "Users Where PartMapID>0 AND NOT Registered", PE\GetVal($_POST, 'UserID',TRUE));
+					$Data->show_sel("PartMapID", "UserName","select PartMapID,UserName "
+									. "from " . MySQL_Pre . "Users Where PartMapID>0 AND NOT Registered", PE\GetVal($_POST, 'PartMapID',TRUE));
 				?>
 				</select>
 				</div>
@@ -58,14 +58,14 @@ PE\HtmlHeader("Register");
 					src="../../captcha/securimage_show.php?sid=<?php echo md5(time()) ?>" />
 				<a style="margin-top: 42px; margin-left: 10px;" tabindex="-1"
 					style="border-style: none" href="#" title="Refresh Image"
-					onClick="document.getElementById('siimage').src = '../../captcha/securimage_show.php?sid=' + Math.random(); return false">
+					onClick="document.getElementById('siimage').src = '../../captcha/securimage_show.php?sid=' + Math.random(); return false;">
 					<img src="../../captcha/images/refresh.gif" alt="Reload Image"
-					border="0" onClick="this.blur()" align="bottom" />
+					border="0" onClick="this.blur();" align="bottom" />
 				</a> <br /> Image Code:
 				<!-- NOTE: the "name" attribute is "code" so that $img->check($_POST['code']) will check the submitted form field -->
 				<input type="text" name="code" size="12" />
 				<input style="width:80px;" type="submit" value="Register" 
-					onClick="document.getElementById('UserPass').value=MD5(document.getElementById('UserPass').value"/>
+					onClick="document.getElementById('UserPass').value=MD5(document.getElementById('UserPass').value);"/>
 				</div>
 			</form>
 		<?php
@@ -74,9 +74,10 @@ PE\HtmlHeader("Register");
 		{
 			$email=$Data->SqlSafe($_POST['v_email']);
 			$Pass=$Data->SqlSafe($_POST['UserPass']);
-			$UserID=$Data->SqlSafe($_POST['UserID']);
+			$PartMapID=$Data->SqlSafe($_POST['PartMapID']);
 			if(strlen($_POST['feed_txt'])<=1024 && strlen($_POST['v_email'])<=50 && strlen($_POST['v_name'])<=50){
-				$Qry="Update ".MySQL_Pre."Users SET UserID='{$email}',UserPass='{$Pass}',Registered=1 Where UserID='{$UserID}'";
+				$Qry="Update ".MySQL_Pre."Users SET UserID='{$email}',UserPass='{$Pass}',Registered=1 "
+					." Where Registered=0 AND Activated=0 AND PartMapID='{$PartMapID}'";
 				$Submitted=$Data->do_ins_query($Qry);
 				$_SESSION['Msg']=$Qry;
 			}

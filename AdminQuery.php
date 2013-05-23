@@ -2,13 +2,11 @@
 use PanchayatElection as PE;
 require_once('functions.php');
 session_start();
+PE\srer_auth();
 if ($_SESSION['UserName']!=="Admin") {
 	header("HTTP/1.0 404 Not Found");
 	exit;
 }
-if(PE\GetVal($_GET,'Me'))
-	$_SESSION['ShowQuery']=1;
-PE\srer_auth();
 PE\HtmlHeader("Report");
 ?>
 <style type="text/css" media="all">
@@ -64,6 +62,7 @@ $(function() {
 			$Data->show_sel("block_municd","block_muni_nm",$Qry,PE\GetVal($_POST,'BlockCode')); ?>
 			</select>
 			<input type="submit" name="CmdSubmit" value="Show Office"/>
+			<input type="submit" name="CmdSubmit" value="Show Groups"/>
 			<h3>Office Code:</h3>
 			<select name="off_code" id="off_code">
 			<?php 
@@ -76,10 +75,15 @@ $(function() {
 		<div style="clear:both;"></div>
 			<hr />
 			<input type="submit" name="CmdQuery" value="Block wise Personnel Count"/>
+			<input type="submit" name="CmdQuery" value="Block wise Others Count"/>
 			<input type="submit" name="CmdQuery" value="Block wise Office Count"/>
 			<input type="submit" name="CmdQuery" value="Total Personnel Count"/>
 			<input type="submit" name="CmdQuery" value="Office Count"/>
 			<input type="submit" name="CmdQuery" value="Total Office"/>
+			<input type="submit" name="CmdQuery" value="Show Groups"/>
+			<input type="submit" name="CmdQuery" value="Error B.Pay"/>
+			<input type="submit" name="CmdQuery" value="Error B.Pay Count"/>
+			<input type="submit" name="CmdQuery" value="Unmatched Scale"/>
 			<hr />
 		<div style="clear:both;"></div>
 		</form>
@@ -113,13 +117,28 @@ $(function() {
 					. " from ".MySQL_Pre."office O LEFT JOIN (Select * from ".MySQL_Pre."personnel Where {$ShowDelete} Deleted) P ON (O.off_code=P.off_code) "
 					. "Where O.blockmuni='" . PE\GetVal($_POST,'BlockCode') . "' Group By O.off_code";
 				PE\ShowData($Qry);
+                $_SESSION['Msg']=$Qry;
 				$_SESSION['BlockCode'] = PE\GetVal($_POST,'BlockCode');
+				break;
+			case (PE\GetVal($_POST,'CmdSubmit')==="Show Groups"):
+				$Qry="Select description, count(per_code) as `Actual Count` "
+					. " from ".MySQL_Pre."office O INNER JOIN (Select * from ".MySQL_Pre."personnel Where {$ShowDelete} Deleted) P "
+					. "ON (O.off_code=P.off_code) INNER JOIN ".MySQL_Pre."scale S ON S.scalecode=P.scalecode Where O.blockmuni='" . PE\GetVal($_POST,'BlockCode') . "' Group By P.scalecode";
+						PE\ShowData($Qry);
+				//$_SESSION['Msg']=$Qry;
 				break;
 			case (PE\GetVal($_POST,'CmdQuery')==="Block wise Personnel Count"):
 				$Qry="Select O.blockmuni,B.block_muni_nm,count(per_code) as `Total Staff` "
 					. " from ".MySQL_Pre."office O LEFT JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code)"
 					. " LEFT JOIN ".MySQL_Pre."Block_muni B ON (B.block_municd=O.blockmuni) Where {$ShowDelete} Deleted Group By O.blockmuni";
 				PE\ShowData($Qry);
+				break;
+			case (PE\GetVal($_POST,'CmdQuery')==="Block wise Others Count"):
+				$Qry="Select O.blockmuni,B.block_muni_nm,count(per_code) as `Total Staff` "
+					. " from ".MySQL_Pre."office O INNER JOIN (Select * from ".MySQL_Pre."personnel where HB='0bm') P ON (O.off_code=P.off_code)"
+					. " INNER JOIN ".MySQL_Pre."Block_muni B ON (B.block_municd=O.blockmuni)  Where {$ShowDelete} Deleted Group By O.blockmuni";
+				PE\ShowData($Qry);
+				//$_SESSION['Msg']=$Qry;
 				break;
 			case (PE\GetVal($_POST,'CmdQuery')==="Block wise Office Count"):
 				$Qry="Select O.blockmuni,B.block_muni_nm,count(DISTINCT O.off_code) as `Total Staff` "
@@ -134,13 +153,43 @@ $(function() {
 				break;
 			case (PE\GetVal($_POST,'CmdQuery')==="Office Count"):
 				$Qry="Select count(distinct O.off_code) "
-					. "  from ".MySQL_Pre."office O LEFT JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) Where {$ShowDelete} Deleted";
+					. " from ".MySQL_Pre."office O INNER JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) "
+					. " Where {$ShowDelete} Deleted AND O.blockmuni!='0bm'";
 				echo "<p>Total Offices having at least one personnel: ".$Data->do_max_query($Qry)."</p>";
 				break;
 			case (PE\GetVal($_POST,'CmdQuery')==="Total Office"):
 				$Qry="Select count(*)"
 					. "  from ".MySQL_Pre."office Where {$ShowDelete} OffDeleted";
 				echo "<p>Total Offices: ".$Data->do_max_query($Qry)."</p>";
+				break;
+			case (PE\GetVal($_POST,'CmdQuery')==="Show Groups"):
+				$Qry="Select sdiv_cd, PostStatus, count(per_code) as `Actual Count` "
+					. " from ((Select off_code,blockmuni from ".MySQL_Pre."office where blockmuni!='0bm') O INNER JOIN ".MySQL_Pre."Block_muni B ON (B.block_municd=O.blockmuni)) "
+					. "INNER JOIN ((Select per_code,off_code,scalecode from ".MySQL_Pre."personnel Where {$ShowDelete} Deleted) P INNER JOIN ".MySQL_Pre."scale S ON S.scalecode=P.scalecode) "
+					. "ON (O.off_code=P.off_code) Group By sdiv_cd,PostStatus";
+				PE\ShowData($Qry);
+				$_SESSION['Msg']=$Qry;
+				break;
+			case (PE\GetVal($_POST,'CmdQuery')==="Error B.Pay"):
+				$Qry="Select P.per_code,P.officer_nm,DATE_FORMAT(date_ob,'%d/%m/%Y') as date_ob,pay "
+						. " from ".MySQL_Pre."office O INNER JOIN (Select * from ".MySQL_Pre."personnel Where NOT Deleted AND pay<6600) P "
+						. "ON (O.off_code=P.off_code) ";
+				PE\ShowData($Qry);
+				//$_SESSION['Msg']=$Qry;
+				break;
+			case (PE\GetVal($_POST,'CmdQuery')==="Error B.Pay Count"):
+				$Qry="Select O.blockmuni,count(P.per_code) as `Actual Count` "
+					. " from ".MySQL_Pre."office O INNER JOIN (Select * from ".MySQL_Pre."personnel Where NOT Deleted AND pay<6600) P "
+					. "ON (O.off_code=P.off_code) Group by O.blockmuni";
+				PE\ShowData($Qry);
+				//$_SESSION['Msg']=$Qry;
+				break;
+			case (PE\GetVal($_POST,'CmdQuery')==="Unmatched Scale"):
+				$Qry="Select O.off_code,P.per_code,P.officer_nm,DATE_FORMAT(date_ob,'%d/%m/%Y') as date_ob,pay,S.description "
+						. " from ".MySQL_Pre."office O INNER JOIN (Select * from ".MySQL_Pre."personnel Where NOT Deleted) P "
+						. "ON (O.off_code=P.off_code) INNER JOIN ".MySQL_Pre."scale S ON (S.scalecode=P.scalecode) Where P.scalecode<14";
+				PE\ShowData($Qry);
+				//$_SESSION['Msg']=$Qry;
 				break;
 		}
 		if(PE\GetVal($_SESSION,'ShowQuery')==1)

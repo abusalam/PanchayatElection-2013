@@ -33,12 +33,10 @@ if ($action != "Valid") {
 	PE\initSRER();
 }
 $LogC = 0;
-if ((PE\GetVal($_POST, 'UserID') !== NULL) && (PE\GetVal($_POST, 'UserPass') !==
-	NULL)) {
-	$QueryLogin =
-		"Select BlockCode,UserName,sdiv_cd from `".MySQL_Pre."Users` U,".MySQL_Pre."Block_muni B where U.BlockCode=B.block_municd AND `UserID`='" .
-		$_POST['UserID'] . "' AND MD5(concat(`UserPass`,MD5('" . $_POST[
-		'LoginToken'] . "')))='" . $_POST['UserPass'] . "' AND Activated";
+if ((PE\GetVal($_POST, 'UserID') !== NULL) && (PE\GetVal($_POST, 'UserPass') !==NULL)) {
+	$QueryLogin ="Select BlockCode,UserName,sdiv_cd from `".MySQL_Pre."Users` U,".MySQL_Pre."Block_muni B "
+			. "where U.BlockCode=B.block_municd AND `UserID`='" . $_POST['UserID'] . "' AND MD5(concat(`UserPass`,MD5('" 
+			. $_POST['LoginToken'] . "')))='" . $_POST['UserPass'] . "' AND Activated";
 	$rows = $Data->do_sel_query($QueryLogin);
 	if ($rows > 0) {
 		session_regenerate_id();
