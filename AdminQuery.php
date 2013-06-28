@@ -84,6 +84,11 @@ $(function() {
 			<input type="submit" name="CmdQuery" value="Error B.Pay"/>
 			<input type="submit" name="CmdQuery" value="Error B.Pay Count"/>
 			<input type="submit" name="CmdQuery" value="Unmatched Scale"/>
+			<input type="submit" name="CmdQuery" value="No Staff"/>
+			<input type="submit" name="CmdQuery" value="All P4"/>
+			<input type="submit" name="CmdQuery" value="Invalid DOB"/>
+			<input type="submit" name="CmdQuery" value="Invalid B.Pay"/>
+			<input type="submit" name="CmdQuery" value="Invalid Scale"/>
 			<hr />
 		<div style="clear:both;"></div>
 		</form>
@@ -93,7 +98,7 @@ $(function() {
 		$ShowDelete=PE\GetVal($_POST,'ChkShow');
 		switch (TRUE){
 			case ((PE\GetVal($_POST,'off_code')) && (PE\GetVal($_POST,'CmdSubmit')==="Show Data")):
-				$Qry="Select OldPerCode,P.per_code,P.officer_nm,DATE_FORMAT(date_ob,'%d/%m/%Y') as date_ob,present_ad1,pay,description,epic,"
+				$Qry="Select P.per_code,P.officer_nm,DATE_FORMAT(date_ob,'%d/%m/%Y') as date_ob,present_ad1,pay,description,epic,"
 					. " P.mobile,rem_desc,assembly_temp,assembly_off,HB "
 					. " from ".MySQL_Pre."office O LEFT JOIN (Select * from ".MySQL_Pre."personnel Where {$ShowDelete} Deleted) P ON (O.off_code=P.off_code) "
 					. " LEFT JOIN ".MySQL_Pre."scale S ON (S.scalecode=P.scalecode) "
@@ -104,7 +109,7 @@ $(function() {
 				PE\ShowData($Qry);
 				break;
 			case (PE\GetVal($_POST,'CmdSubmit')==="Show Data"):
-				$Qry="Select OldPerCode,P.per_code,P.officer_nm,DATE_FORMAT(date_ob,'%d/%m/%Y') as date_ob,present_ad1,pay,description,epic,"
+				$Qry="Select P.per_code,P.officer_nm,DATE_FORMAT(date_ob,'%d/%m/%Y') as date_ob,present_ad1,pay,description,epic,"
 					. " P.mobile,rem_desc,assembly_temp,assembly_off,HB "
 					. " from ".MySQL_Pre."office O LEFT JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) "
 					. " LEFT JOIN ".MySQL_Pre."scale S ON (S.scalecode=P.scalecode) "
@@ -113,7 +118,7 @@ $(function() {
 				PE\ShowData($Qry);
 				break;
 			case (PE\GetVal($_POST,'CmdSubmit')==="Show Office"):
-				$Qry="Select O.off_code,OldOffCode,office,address1,totstaff,count(per_code) as `Actual Count` "
+				$Qry="Select O.off_code,office,address1,totstaff,count(per_code) as `Actual Count` "
 					. " from ".MySQL_Pre."office O LEFT JOIN (Select * from ".MySQL_Pre."personnel Where {$ShowDelete} Deleted) P ON (O.off_code=P.off_code) "
 					. "Where O.blockmuni='" . PE\GetVal($_POST,'BlockCode') . "' Group By O.off_code";
 				PE\ShowData($Qry);
@@ -122,9 +127,10 @@ $(function() {
 				break;
 			case (PE\GetVal($_POST,'CmdSubmit')==="Show Groups"):
 				$Qry="Select description, count(per_code) as `Actual Count` "
-					. " from ".MySQL_Pre."office O INNER JOIN (Select * from ".MySQL_Pre."personnel Where {$ShowDelete} Deleted) P "
-					. "ON (O.off_code=P.off_code) INNER JOIN ".MySQL_Pre."scale S ON S.scalecode=P.scalecode Where O.blockmuni='" . PE\GetVal($_POST,'BlockCode') . "' Group By P.scalecode";
-						PE\ShowData($Qry);
+					. " from ".MySQL_Pre."office O INNER JOIN (Select * from ".MySQL_Pre."personnel Where Deleted=0 AND remarks='99' and date_ob>'1953-07-01') P "
+					. "ON (O.off_code=P.off_code) INNER JOIN ".MySQL_Pre."scale S ON (S.scalecode=P.scalecode AND S.PostStatus!='P0') Where O.blockmuni='" 
+					. PE\GetVal($_POST,'BlockCode') . "' Group By P.scalecode";
+				PE\ShowData($Qry);
 				//$_SESSION['Msg']=$Qry;
 				break;
 			case (PE\GetVal($_POST,'CmdQuery')==="Block wise Personnel Count"):
@@ -165,7 +171,8 @@ $(function() {
 			case (PE\GetVal($_POST,'CmdQuery')==="Show Groups"):
 				$Qry="Select sdiv_cd, PostStatus, count(per_code) as `Actual Count` "
 					. " from ((Select off_code,blockmuni from ".MySQL_Pre."office where blockmuni!='0bm') O INNER JOIN ".MySQL_Pre."Block_muni B ON (B.block_municd=O.blockmuni)) "
-					. "INNER JOIN ((Select per_code,off_code,scalecode from ".MySQL_Pre."personnel Where {$ShowDelete} Deleted) P INNER JOIN ".MySQL_Pre."scale S ON S.scalecode=P.scalecode) "
+					. "INNER JOIN ((Select per_code,off_code,scalecode from ".MySQL_Pre."personnel Where Deleted=0 AND remarks='99' and date_ob>'1953-07-01') P INNER JOIN "
+					. MySQL_Pre."scale S ON (S.scalecode=P.scalecode AND S.PostStatus!='P0')) "
 					. "ON (O.off_code=P.off_code) Group By sdiv_cd,PostStatus";
 				PE\ShowData($Qry);
 				$_SESSION['Msg']=$Qry;
@@ -190,6 +197,40 @@ $(function() {
 						. "ON (O.off_code=P.off_code) INNER JOIN ".MySQL_Pre."scale S ON (S.scalecode=P.scalecode) Where P.scalecode<14";
 				PE\ShowData($Qry);
 				//$_SESSION['Msg']=$Qry;
+				break;
+			case (PE\GetVal($_POST,'CmdQuery')==="No Staff"):
+				$Qry="Select O.off_code,office,address1,count(per_code) as `Staff Count` "
+					. " from ".MySQL_Pre."office O LEFT JOIN (Select * from ".MySQL_Pre."personnel Where NOT Deleted) P ON (O.off_code=P.off_code) "
+					. " Where O.blockmuni='" . PE\GetVal($_SESSION,'BlockCode') . "' Group By O.off_code having count(per_code)<1";
+				PE\ShowData($Qry);
+				break;
+			case (PE\GetVal($_POST,'CmdQuery')==="All P4"):
+				$Qry="Select O.off_code,office,totstaff,count(PostStatus) as `P4 Count` "
+					. " from ".MySQL_Pre."office O LEFT JOIN (Select * from ".MySQL_Pre."personnel Where NOT Deleted) P ON (O.off_code=P.off_code) "
+					. "left join ".MySQL_Pre."scale S on (S.scalecode=P.scalecode and S.PostStatus='P4')"
+					. " Where O.blockmuni='" . PE\GetVal($_SESSION,'BlockCode') . "' Group By O.off_code having (totstaff=count(PostStatus) and count(PostStatus)>0)";
+				PE\ShowData($Qry);
+				break;
+			case (PE\GetVal($_POST,'CmdQuery')==="Invalid DOB"):
+				$Qry="Select O.off_code,office,O.blockmuni,per_code,P.officer_nm,date_ob"
+					. " from ".MySQL_Pre."office O LEFT JOIN (Select * from ".MySQL_Pre."personnel Where NOT Deleted) P ON (O.off_code=P.off_code) "
+					. " Where O.blockmuni!='0bm' and (date_ob='1970-01-01' or date_ob<='1953-07-01')";
+				PE\ShowData($Qry);
+				//$_SESSION['Msg']=$Qry;
+				break;
+			case (PE\GetVal($_POST,'CmdQuery')==="Invalid B.Pay"):
+				$Qry="Select O.off_code,office,per_code,P.officer_nm,pay "
+					. " from ".MySQL_Pre."office O LEFT JOIN (Select * from ".MySQL_Pre."personnel Where NOT Deleted) P ON (O.off_code=P.off_code) "
+					. " Where O.blockmuni='" . PE\GetVal($_SESSION,'BlockCode') . "' and (pay<4000 or pay>40000)";
+				PE\ShowData($Qry);
+				break;
+			case (PE\GetVal($_POST,'CmdQuery')==="Invalid Scale"):
+				$Qry="Select O.off_code,office,per_code,P.officer_nm,description,pay"
+					. " from ".MySQL_Pre."office O LEFT JOIN (Select * from ".MySQL_Pre."personnel Where NOT Deleted) P ON (O.off_code=P.off_code) "
+					. "left join ".MySQL_Pre."scale S on (S.scalecode=P.scalecode)"
+					. " Where O.blockmuni='" . PE\GetVal($_SESSION,'BlockCode') . "' and S.PostStatus='P0'";
+					$_SESSION['Msg']=$Qry;
+				PE\ShowData($Qry);
 				break;
 		}
 		if(PE\GetVal($_SESSION,'ShowQuery')==1)

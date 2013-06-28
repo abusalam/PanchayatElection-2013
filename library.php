@@ -15,8 +15,11 @@ function initpage()
 	echo '<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" >';
 	$t=(isset($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:"");
 	$reg=new DB();
+	$reg->do_ins_query("INSERT INTO ".MySQL_Pre."Visitors(ip,vpage,uagent,referrer) values"		
+		."('".$_SERVER['REMOTE_ADDR']."','".htmlspecialchars($_SERVER['PHP_SELF'])."','".$_SERVER['HTTP_USER_AGENT']
+		."','<".$t.">');");
 	$reg->do_ins_query("INSERT INTO ".MySQL_Pre."Logs(IP,URL,UserAgent,Referrer,SessionID) values"
-			."('".$_SERVER['REMOTE_ADDR']."','".$_SERVER['PHP_SELF']."','".$_SERVER['HTTP_USER_AGENT']."','<".$t.">','".$_SESSION['Client_SID']."');");
+		."('".$_SERVER['REMOTE_ADDR']."','".$_SERVER['PHP_SELF']."','".$_SERVER['HTTP_USER_AGENT']."','<".$t.">','".$_SESSION['Client_SID']."');");
 	if(isset($_REQUEST['show_src']))
 	{
 		if($_REQUEST['show_src']=="me")

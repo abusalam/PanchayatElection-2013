@@ -73,7 +73,7 @@ PE\HtmlHeader("Register");
 		else
 		{
 			$email=$Data->SqlSafe($_POST['v_email']);
-			$Pass=$Data->SqlSafe($_POST['UserPass']);
+			$Pass=MD5($Data->SqlSafe($_POST['UserPass']));
 			$PartMapID=$Data->SqlSafe($_POST['PartMapID']);
 			if(strlen($_POST['feed_txt'])<=1024 && strlen($_POST['v_email'])<=50 && strlen($_POST['v_name'])<=50){
 				$Qry="Update ".MySQL_Pre."Users SET UserID='{$email}',UserPass='{$Pass}',Registered=1 "
@@ -84,7 +84,7 @@ PE\HtmlHeader("Register");
 			if($Submitted>0)
 				echo '<h3>You have registered yourself successfully.</h3>';
 			else
-				echo "<h3>Unable to send request.</h3>";
+				echo "<h3>Unable to send request.</h3>".$_SESSION['Msg'];
 		}
 		?>
 		<div style="clear:both;"></div>

@@ -111,7 +111,7 @@ $(function() {
 				//$_SESSION['Msg']=$Qry;
 				break;
 			case (PE\GetVal($_POST,'CmdSubmit')==="Show Data"):
-				$Qry="Select OldPerCode,P.per_code,P.officer_nm,DATE_FORMAT(date_ob,'%d/%m/%Y') as date_ob,present_ad1,pay,description,epic,"
+				$Qry="Select P.per_code,P.officer_nm,DATE_FORMAT(date_ob,'%d/%m/%Y') as date_ob,present_ad1,pay,description,epic,"
 				 . " P.mobile,rem_desc,assembly_temp,assembly_off,HB "
 				 . " from ".MySQL_Pre."office O LEFT JOIN ".MySQL_Pre."personnel P ON (O.off_code=P.off_code) "
 				 . " LEFT JOIN ".MySQL_Pre."scale S ON (S.scalecode=P.scalecode) "
@@ -123,7 +123,7 @@ $(function() {
 				PE\ShowData($Qry);
 				break;
 			case (PE\GetVal($_POST,'CmdQuery')==="No Staff"):
-				$Qry="Select O.off_code,OldOffCode,office,address1,count(per_code) as `Staff Count` "
+				$Qry="Select O.off_code,office,address1,count(per_code) as `Staff Count` "
 					. " from ".MySQL_Pre."office O LEFT JOIN (Select * from ".MySQL_Pre."personnel Where NOT Deleted) P ON (O.off_code=P.off_code) "
 					. " Where O.blockmuni='" . PE\GetVal($_SESSION,'BlockCode') . "' Group By O.off_code having count(per_code)<1";
 				PE\ShowData($Qry);
@@ -138,7 +138,7 @@ $(function() {
 			case (PE\GetVal($_POST,'CmdQuery')==="Invalid DOB"):
 				$Qry="Select O.off_code,office,per_code,P.officer_nm,date_ob"
 					. " from ".MySQL_Pre."office O LEFT JOIN (Select * from ".MySQL_Pre."personnel Where NOT Deleted) P ON (O.off_code=P.off_code) "
-					. " Where O.blockmuni='" . PE\GetVal($_SESSION,'BlockCode') . "' and (date_ob='1970-01-01' or date_ob<'1953-07-01')";
+					. " Where O.blockmuni='" . PE\GetVal($_SESSION,'BlockCode') . "' and (date_ob='1970-01-01' or date_ob<='1953-07-01')";
 				PE\ShowData($Qry);
 				//$_SESSION['Msg']=$Qry;
 				break;
@@ -157,7 +157,7 @@ $(function() {
 				PE\ShowData($Qry);
 				break;
 			default:
-				PE\ShowData("Select O.off_code,OldOffCode,office,address1,totstaff,count(PostStatus) as `P4 Count` "
+				PE\ShowData("Select O.off_code,office,address1,totstaff,count(PostStatus) as `P4 Count` "
 					. " from ".MySQL_Pre."office O LEFT JOIN (Select * from ".MySQL_Pre."personnel Where NOT Deleted) P ON (O.off_code=P.off_code) "
 					. "left join ".MySQL_Pre."scale S on (S.scalecode=P.scalecode and S.PostStatus='P4')"
 					. " Where O.blockmuni='" . PE\GetVal($_SESSION,'BlockCode') . "' Group By O.off_code");
