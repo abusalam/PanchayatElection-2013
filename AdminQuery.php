@@ -100,6 +100,8 @@ PE\HtmlHeader("Report");
 
     <br/>
     <?php
+    $CountPers = 'SELECT count(*) FROM `PE2013_count_personnel` Where Deleted=0';
+    echo 'Total Counting Personnel: ' . $Data->do_max_query($CountPers);
     $ShowDelete = PE\GetVal($_POST, 'ChkShow');
     switch (TRUE) {
       case ((PE\GetVal($_POST, 'off_code')) && (PE\GetVal($_POST, 'CmdSubmit') === "Show Data")):

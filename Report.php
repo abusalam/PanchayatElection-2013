@@ -83,15 +83,17 @@ PE\HtmlHeader("Report");
       </div>
       <div style="clear:both;"></div>
       <hr />
-      <!--input type="submit" name="CmdQuery" value="Ofice wise Others Count"/>
-      <input type="submit" name="CmdQuery" value="Scalewise Personnel Count"/>
-      <input type="submit" name="CmdQuery" value="Error B.Pay"/>
-      <input type="submit" name="CmdQuery" value="Unmatched Scale"/>
-      <input type="submit" name="CmdQuery" value="No Staff"/>
-      <input type="submit" name="CmdQuery" value="All P4"/>
-      <input type="submit" name="CmdQuery" value="Invalid DOB"/>
-      <input type="submit" name="CmdQuery" value="Invalid B.Pay"/>
-      <input type="submit" name="CmdQuery" value="Invalid Scale"/-->
+      <?php /*
+        <!--input type="submit" name="CmdQuery" value="Ofice wise Others Count"/>
+        <input type="submit" name="CmdQuery" value="Scalewise Personnel Count"/>
+        <input type="submit" name="CmdQuery" value="Error B.Pay"/>
+        <input type="submit" name="CmdQuery" value="Unmatched Scale"/>
+        <input type="submit" name="CmdQuery" value="No Staff"/>
+        <input type="submit" name="CmdQuery" value="All P4"/>
+        <input type="submit" name="CmdQuery" value="Invalid DOB"/>
+        <input type="submit" name="CmdQuery" value="Invalid B.Pay"/>
+        <input type="submit" name="CmdQuery" value="Invalid Scale"/--> */
+      ?>
       <input type="submit" name="CmdSubmit" value="Download All Corrigendum Letters"/>
       <input type="text" name="PerCode" value="Personnel ID"/>
       <input type="submit" name="CmdSubmit" value="Single Corrigendum Letter"/>

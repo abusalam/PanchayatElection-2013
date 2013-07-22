@@ -7,7 +7,6 @@ $lessB = '';
 $lessM = '';
 $lessNM = '';
 $lessDG = '';
-$lessFlC = '';
 $Ferror = 0;
 $Uerror = 0;
 require_once('functions.php');
@@ -22,27 +21,10 @@ if (Pe\GetVal($_POST, 'CmdMode') !== NULL) {
   $_SESSION['Step'] = substr($_SESSION['StepDesc'], 0, 1);
   $_SESSION["PostData"] = array();
 }
-if ((PE\GetVal($_POST, 'AppSubmit') === "Save") || (PE\GetVal($_POST, 'AppSubmit') === "Update")) {
-  $_SESSION['PostData'] = PE\InpSanitize($_POST);
-}
+$_SESSION['PostData'] = PE\InpSanitize($_POST);
+$_SESSION['Msg'] = '';
 switch (PE\GetVal($_SESSION, "Step")) {
   case 'A':
-    if (PE\GetVal($_POST, 'AppSubmit') === "Show") {
-      $Qry = "Select O.off_code,office,address1,totstaff,OldOffCode,count(per_code) as `ActStaff` " .
-              "from " . MySQL_Pre . "office O LEFT JOIN (Select * from " . MySQL_Pre . "personnel Where NOT Deleted) P ON (O.off_code=P.off_code) " .
-              "where blockmuni='{$_SESSION['BlockCode']}' AND O.off_code='{$_SESSION['SubDivn']}" . PE\GetVal($_POST, 'off_code') . "' Group by office";
-      $Data->do_sel_query($Qry);
-      if ($Data->RowCount > 0) {
-        $Row = $Data->get_row();
-        $_SESSION['PostData'] = $Row;
-        if (($Row['totstaff'] - $Row['ActStaff']) < 1) {
-          $_SESSION['Step'] = NULL;
-          $_SESSION['Msg'] = "Actual Staff: {$Row['ActStaff']} / {$Row['totstaff']} [Total Staff Strength] No more Personnel can be added!";
-        }
-      } else {
-        $_SESSION['Msg'] = " Office Not Found! ";
-      }
-    }
     if (PE\GetVal($_POST, 'AppSubmit') === "Save") {
 
       if (strlen($_SESSION['PostData']['off_code_cp']) === 8) {
@@ -86,18 +68,11 @@ switch (PE\GetVal($_SESSION, "Step")) {
         $_SESSION['PostData']['STATUS'] = '';
       }
       else
-        $_SESSION['Msg'] = "Unable to Insert! " . $lessB . $lessM . $lessNM . $lessDG . $lessFlC;
+        $_SESSION['Msg'] = "Unable to Insert! " . $lessB . $lessM . $lessNM . $lessDG;
     }
-    //---------------------------------------------------------
     break;
   case 'U':
-    if (PE\GetVal($_POST, 'AppSubmit') === "Save and Show Next") {
-
-    } elseif (PE\GetVal($_POST, 'AppSubmit') === "Save and Show Previous") {
-
-    } elseif ((PE\GetVal($_POST, 'AppSubmit') === "Update")) {
-      //-----------------------------------------------------------------
-
+    if ((PE\GetVal($_POST, 'AppSubmit') === "Update")) {
       if (($_SESSION['PostData']['BASICpay'] < 6600) || (is_numeric($_SESSION['PostData']['BASICpay']) == FALSE)) {
         $Uerror = 1;
         $lessB = " Basic Pay Can not less than 6600!";
@@ -106,60 +81,52 @@ switch (PE\GetVal($_SESSION, "Step")) {
         $Uerror = 1;
         $lessNM = " Name of Employee can not be blank!";
       }
-
       if (strlen($_SESSION['PostData']['OFF_DESC']) === 0) {
         $Uerror = 1;
         $lessDG = " Office Designation can not be blank!";
       }
-      // elseif (!is_numeric($_SESSION['PostData']['mobile']) && strlen($_SESSION['PostData']['mobile'])<10){
       if ((strlen($_SESSION['PostData']['mobile']) < 10) || (is_numeric($_SESSION['PostData']['mobile']) == FALSE)) {
         $Uerror = 1;
         $lessM = " Mobile No must be 10 digit numeric field!";
       }
-
-
-      //--------------------------------------------------------------------
-
-      if ($Uerror === 0) { //newmmmmm
+      if ($Uerror === 0) {
         $Qry = "Update " . MySQL_Pre . "count_personnel set officer_nm='{$_SESSION['PostData']['officer_nm']}',OFF_DESC='{$_SESSION['PostData']['OFF_DESC']}',"
                 . " STATUS='{$_SESSION['PostData']['STATUS']}',HOMEBLOCK_CODE='{$_SESSION['PostData']['HOMEBLOCK_CODE']}',"
                 . " BASICpay='{$_SESSION['PostData']['BASICpay']}',mobile='{$_SESSION['PostData']['mobile']}',gender='{$_SESSION['PostData']['gender']}' "
                 . " Where PersSL={$_SESSION['PostData']['PersSL']} AND OFFBLOCK_CODE='{$_SESSION['BlockCode']}'";
-
         $Data->do_ins_query($Qry);
-      } //newwwww
-      if ($Data->RowCount > 0) {
-        $_SESSION['Msg'] = "Personnel Updated Successfully!";
-        //$_SESSION["PostData"] = array();
+        if ($Data->RowCount > 0) {
+          $_SESSION['Msg'] = "Personnel Updated Successfully!";
+        } else {
+          $_SESSION['Msg'] = "Unable to Update!" . $lessB . $lessM . $lessNM . $lessDG;
+        }
+      } elseif (PE\GetVal($_POST, 'AppSubmit') === "Delete") {
+        $Qry = "Update " . MySQL_Pre . "count_personnel set Deleted=1 Where PersSL='" . PE\GetVal($_POST, 'PersSL') . "'";
+        $Data->do_ins_query($Qry);
+        if ($Data->RowCount > 0) {
+          $_SESSION['Msg'] = "Personnel Deleted Successfully!";
+        }
+        else
+          $_SESSION['Msg'] = "Unable to Delete!";
       }
-      else
-        $_SESSION['Msg'] = "Unable to Update!" . $lessB . $lessM . $lessNM . $lessDG . $lessFlC; //$Qry;
-    }elseif (PE\GetVal($_POST, 'AppSubmit') === "Delete") {
-      $Qry = "Update " . MySQL_Pre . "count_personnel set Deleted=1 Where PersSL='" . PE\GetVal($_POST, 'PersSL') . "'";
-      $Data->do_ins_query($Qry);
-      if ($Data->RowCount > 0) {
-        $_SESSION['Msg'] = "Personnel Deleted Successfully!";
-        $_SESSION["PostData"] = array();
-      }
-      else
-        $_SESSION['Msg'] = "Unable to Delete!";
-    }
-    if (PE\GetVal($_POST, 'AppSubmit') === "Show") {
-      $Qry = "Select P.officer_nm,OFF_DESC,STATUS,HOMEBLOCK_CODE,BASICpay,gender,P.mobile,PersSL" .
-              " from " . MySQL_Pre . "count_personnel P LEFT JOIN " . MySQL_Pre . "office O ON (O.off_code=P.off_code_cp)" .
-              " where  P.OFFBLOCK_CODE='{$_SESSION['BlockCode']}' AND P.PersSL='" . PE\GetVal($_POST, 'PersSL') . "'";
-      $Data->do_sel_query($Qry);
-      if ($Data->RowCount > 0) {
-        $Row = $Data->get_row();
-        $_SESSION['PostData'] = $Row;
-      } elseif ($Data->RowCount > 1) {
-        $_SESSION['Msg'] = " Duplicate Personnel Found!";
+      if (PE\GetVal($_POST, 'AppSubmit') === "Show") {
+        $Qry = "Select P.officer_nm,OFF_DESC,STATUS,HOMEBLOCK_CODE,BASICpay,gender,P.mobile,PersSL,P.off_code_cp" .
+                " from " . MySQL_Pre . "count_personnel P LEFT JOIN " . MySQL_Pre . "office O ON (O.off_code=P.off_code_cp)" .
+                " where  P.OFFBLOCK_CODE='{$_SESSION['BlockCode']}' AND P.PersSL='" . PE\GetVal($_POST, 'PersSL') . "'";
+        $Data->do_sel_query($Qry);
+        if ($Data->RowCount > 0) {
+          $Row = $Data->get_row();
+          $_SESSION['PostData'] = $Row;
+        } elseif ($Data->RowCount > 1) {
+          $_SESSION['Msg'] = " Duplicate Personnel Found!";
+        } else {
+          $_SESSION['Msg'] = " Personnel Not Found!";
+        }
       } else {
-        $_SESSION['Msg'] = " Personnel Not Found!";
+        if (PE\GetVal($_POST, 'AppSubmit') === "Save") {
+          $_SESSION['PostData'] = PE\InpSanitize($_POST);
+        }
       }
-    } else
-    if (PE\GetVal($_POST, 'AppSubmit') === "Save") {
-      $_SESSION['PostData'] = PE\InpSanitize($_POST);
     }
     break;
 }
