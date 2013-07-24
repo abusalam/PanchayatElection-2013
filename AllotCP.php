@@ -67,24 +67,19 @@ type="text/javascript" src="js/jquery-ui-1.10.2.custom.min.js"></script>
     echo '</pre>';
   }
 
-  function ChildCount($Tree, $Node) {
+  function ChildCount($Tree, $Node, $Depth = 3) {
     $Count = 0;
     foreach ($Tree as $value) {
       if ($Node === $value['P']) {
-        $Child = $value['C'];
-        foreach ($Tree as $value) {
-          if ($Child === $value['P']) {
-            $GrandChild = $value['C'];
-            foreach ($Tree as $value) {
-              if ($GrandChild === $value['P']) {
-                $Count++;
-              }
-            }
-          }
-        }
+        $Count++;
       }
     }
-    return $Count;
+    if ($Depth === 0) {
+      return ($Count);
+    } else {
+      echo '<br>' . $Node . ':' . $value['C'] . ' - ' . $Depth . '(' . ($Count) . ')';
+      return ChildCount($Tree, $value['C'], $Depth - 1);
+    }
   }
 
   function FindSameAdjCount($AdjCount, $DistCP) {
@@ -143,7 +138,7 @@ type="text/javascript" src="js/jquery-ui-1.10.2.custom.min.js"></script>
           $DeployOrder[$i]['AdjCount'] = 999;
         }
         $i++;
-        echo 'Found In: ' . $AdjCountKey . '<br>';
+        //echo 'Found In: ' . $AdjCountKey . '<br>';
       }
       echo 'Deploy: ' . $_SESSION['FinalAdjCount'][$key]['Assembly'] . '<br>';
       SortByCount($DeployOrder, 'AdjCount');
@@ -160,13 +155,44 @@ type="text/javascript" src="js/jquery-ui-1.10.2.custom.min.js"></script>
   <div class="content">
     <h2>Allotment</h2>
     <?php
-    DeployCP();
+//DeployCP();
+    $Data = new MySQLiDBHelper(HOST_Name, MySQL_User, MySQL_Pass, MySQL_DB);
+    $DistCPQry = 'Select Assembly as P,Block as C from ' . MySQL_Pre . 'CP_Distribution';
+    $DistCP = $Data->query($DistCPQry);
+    echo '<br>CountChild: ' . ChildCount($DistCP, 'B24', 3);
 
-    //PrintArr($AdjCount);
+    /*
+      $RequiredCPQry = 'Select Block,Required From ' . MySQL_Pre . 'CP_Required';
+      $Data = new MySQLiDBHelper(HOST_Name, MySQL_User, MySQL_Pass, MySQL_DB);
+      $RequiredCP = $Data->query($RequiredCPQry);
+
+      foreach ($_SESSION['FinalAdjCount'] as $key => $ForAssembly) {
+      $GetRequiredCP = array_values(array_filter($RequiredCP, array(new FilterSame('Block', $ForAssembly['Assembly']), 'IsSame')));
+      echo '<br>Required: ' . $GetRequiredCP[0]['Block'] . '=' . $GetRequiredCP[0]['Required'];
+      $i = 0;
+      PrintArr($_SESSION['FinalAdjCount'][$key]['OrderBy']);
+      while ($i < count($_SESSION['FinalAdjCount'][$key]['OrderBy'])) {
+      $TakeFrom = $_SESSION['FinalAdjCount'][$key]['OrderBy'][$i]['Assembly'];
+      $Data->where('OFFBLOCK_CODE', $TakeFrom);
+      $AvlCP = $Data->get();
+      if (count($AvlCP) > 0) {
+      $AvlCP = $AvlCP[0]['CountingPP'];
+      } else {
+      $AvlCP = 0;
+      }
+      echo '<br>Available CP:' . $AvlCP;
+      $Data->where('ForAssembly', '');
+      $Data->where('OFFBLOCK_CODE', $TakeFrom);
+      $AllotPP = $Data->query('Select PersSL FROM ' . MySQL_Pre . 'count_personnel', $GetRequiredCP[0]['Required']);
+
+      $i++;
+      }
+      } */
+//PrintArr(array_values($RequiredCP));
     ?>
   </div>
   <div class="pageinfo">
-    <?php //PE\pageinfo();                     ?>
+    <?php //PE\pageinfo();                                      ?>
   </div>
   <div class="footer">
     <?php PE\footerinfo(); ?>
