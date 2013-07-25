@@ -67,19 +67,24 @@ type="text/javascript" src="js/jquery-ui-1.10.2.custom.min.js"></script>
     echo '</pre>';
   }
 
-  function ChildCount($Tree, $Node, $Depth = 3) {
+  function ChildCount($Tree, $Node) {
     $Count = 0;
     foreach ($Tree as $value) {
       if ($Node === $value['P']) {
-        $Count++;
+        $Child = $value['C'];
+        foreach ($Tree as $value) {
+          if ($Child === $value['P']) {
+            $GrandChild = $value['C'];
+            foreach ($Tree as $value) {
+              if ($GrandChild === $value['P']) {
+                $Count++;
+              }
+            }
+          }
+        }
       }
     }
-    if ($Depth === 0) {
-      return ($Count);
-    } else {
-      echo '<br>' . $Node . ':' . $value['C'] . ' - ' . $Depth . '(' . ($Count) . ')';
-      return ChildCount($Tree, $value['C'], $Depth - 1);
-    }
+    return $Count;
   }
 
   function FindSameAdjCount($AdjCount, $DistCP) {
@@ -155,11 +160,11 @@ type="text/javascript" src="js/jquery-ui-1.10.2.custom.min.js"></script>
   <div class="content">
     <h2>Allotment</h2>
     <?php
-//DeployCP();
+    //DeployCP();
     $Data = new MySQLiDBHelper(HOST_Name, MySQL_User, MySQL_Pass, MySQL_DB);
     $DistCPQry = 'Select Assembly as P,Block as C from ' . MySQL_Pre . 'CP_Distribution';
     $DistCP = $Data->query($DistCPQry);
-    echo '<br>CountChild: ' . ChildCount($DistCP, 'B24', 3);
+    echo '<br>CountChild: ' . ChildCountA($DistCP, 'B24', 3);
 
     /*
       $RequiredCPQry = 'Select Block,Required From ' . MySQL_Pre . 'CP_Required';
@@ -192,7 +197,7 @@ type="text/javascript" src="js/jquery-ui-1.10.2.custom.min.js"></script>
     ?>
   </div>
   <div class="pageinfo">
-    <?php //PE\pageinfo();                                      ?>
+    <?php //PE\pageinfo();                                          ?>
   </div>
   <div class="footer">
     <?php PE\footerinfo(); ?>
