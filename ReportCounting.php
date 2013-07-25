@@ -3,7 +3,9 @@
 use PanchayatElection as PE;
 
 require_once('functions.php');
-
+if (PE\GetVal($_POST, 'CmdSubmit') === "Office-wise Scroll") {
+  include 'CountingOffScroll.php';
+}
 switch (PE\GetVal($_POST, 'CmdSubmit')) {
   case "Download All Appointment Letters":
   case "Office-wise Appointment Letters":
@@ -49,12 +51,13 @@ PE\HtmlHeader("Report");
         <h3>Office Code:</h3>
         <select name="off_code" id="off_code">
           <?php
-          $Qry = "select off_code,CONCAT(office,' - ',off_code) as office from " . MySQL_Pre . "office where blockmuni='" . PE\GetVal($_SESSION, 'BlockCode') . "'";
+          $Qry = "select off_code,CONCAT(off_code,' - ',office) as office from " . MySQL_Pre . "office where blockmuni='" . PE\GetVal($_SESSION, 'BlockCode') . "'";
           $Data->show_sel("off_code", "office", $Qry, PE\GetVal($_POST, 'off_code'));
           ?>
         </select>
         <input type="submit" name="CmdSubmit" value="Show Data"/>
         <input type="submit" name="CmdSubmit" value="Office-wise Appointment Letters"/>
+
         <label for="ChkShow">Hide Deleted Data</label>
         <input type="checkbox" name="ChkShow" id="ChkShow" value="NOT" checked="checked"/>
       </div>
@@ -63,21 +66,23 @@ PE\HtmlHeader("Report");
       <input type="submit" name="CmdSubmit" value="Download All Appointment Letters"/>
       <input type="text" name="PerCode" placeholder="Personnel ID"/>
       <input type="submit" name="CmdSubmit" value="Single Appointment Letter"/>
-      <hr />
+      <input type="submit" name="CmdSubmit" value="Counting Personnel Scroll"/>
+      <input type="submit" name="CmdSubmit" value="Office-wise Scroll"/><hr />
     </form>
     <div style="clear:both;"></div>
     <br/>
     <?php
     $ShowDelete = " AND " . PE\GetVal($_POST, 'ChkShow') . " Deleted";
-    echo "<h3>" . PE\GetVal($_POST, 'CmdQuery') . "</h3>";
+    echo "<h3>" . PE\GetVal($_POST, 'CmdSubmit') . "</h3>";
     switch (TRUE) {
-      case (PE\GetVal($_POST, 'CmdQuery') === "Ofice wise Others Count"):
-        $Qry = "Select O.off_code,O.office,count(per_code) as `Total Staff` "
-                . " from " . MySQL_Pre . "office O INNER JOIN (Select * from " . MySQL_Pre . "personnel where HB='0bm') P ON (O.off_code=P.off_code)"
-                . "  Where NOT Deleted AND O.blockmuni='" . PE\GetVal($_SESSION, 'BlockCode') . "' Group By O.off_code";
+      case (PE\GetVal($_POST, 'CmdSubmit') === "Counting Personnel Scroll"):
+        $Qry = "Select `PerCode`,`Post Status`,`Officer Name`,`Mobile No`,`Block`,`Office`,`Office Address`,`Post Office`"
+                . " from " . MySQL_Pre . "CP_AsmScroll"
+                . "  Where AssemblyCode='" . PE\GetVal($_SESSION, 'BlockCode') . "'";
+        //$_SESSION['Msg'] = $Qry;
+        echo '<b>Please Note:</b> Post Status (1:Counting Officer, 2:Counting Assistant).<br>';
         PE\ShowData($Qry);
         break;
-
       case (PE\GetVal($_POST, 'CmdSubmit') === "Show Data"):
         $Qry = "Select P.PersSL,P.officer_nm,P.OFF_DESC,M.gender_desc,P.BASICpay,N.status_desc,"
                 . " P.mobile,X.block_muni_nm "

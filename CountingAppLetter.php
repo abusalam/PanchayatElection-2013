@@ -47,7 +47,7 @@ while ($Row = $Data->get_row()) {
   } else {
     $OfficerName = 'Smt ' . $Row['OfficerName'];
   }
-  if ($Row['Post'] === 1) {
+  if ($Row['Post'] === '1') {
     $Post = 'Counting Officer';
   } else {
     $Post = 'Counting Assistant';
