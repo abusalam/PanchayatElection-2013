@@ -3,14 +3,21 @@
 use PanchayatElection as PE;
 
 require_once('functions.php');
-if (PE\GetVal($_POST, 'CmdSubmit') === "Office-wise Scroll") {
-  include 'CountingOffScroll.php';
-}
+
 switch (PE\GetVal($_POST, 'CmdSubmit')) {
   case "Download All Appointment Letters":
   case "Office-wise Appointment Letters":
   case "Single Appointment Letter":
     include 'CountingAppLetter.php';
+    break;
+  case 'Office-wise Scroll':
+    include 'CountingOffScroll.php';
+    break;
+  case 'Counting Hall-wise Scroll':
+    include 'CountingHallScroll.php';
+    break;
+  case 'Counting Personnel Decoding List':
+    include 'HallScrollCP.php';
     break;
 }
 PE\srer_auth();
@@ -67,7 +74,10 @@ PE\HtmlHeader("Report");
       <input type="text" name="PerCode" placeholder="Personnel ID"/>
       <input type="submit" name="CmdSubmit" value="Single Appointment Letter"/>
       <input type="submit" name="CmdSubmit" value="Counting Personnel Scroll"/>
-      <input type="submit" name="CmdSubmit" value="Office-wise Scroll"/><hr />
+      <input type="submit" name="CmdSubmit" value="Office-wise Scroll"/>
+      <input type="submit" name="CmdSubmit" value="Counting Hall-wise Scroll"/>
+      <input type="submit" name="CmdSubmit" value="Counting Personnel Decoding List"/>
+      <hr />
     </form>
     <div style="clear:both;"></div>
     <br/>
@@ -86,10 +96,12 @@ PE\HtmlHeader("Report");
       case (PE\GetVal($_POST, 'CmdSubmit') === "Show Data"):
         $Qry = "Select P.PersSL,P.officer_nm,P.OFF_DESC,M.gender_desc,P.BASICpay,N.status_desc,"
                 . " P.mobile,X.block_muni_nm "
-                . " from " . MySQL_Pre . "office O JOIN " . MySQL_Pre . "count_personnel P ON (O.off_code=P.off_code_cp) JOIN " . MySQL_Pre . "GENDER M on (P.gender=M.gender)"
+                . " from " . MySQL_Pre . "office O JOIN " . MySQL_Pre . "count_personnel P ON (O.off_code=P.off_code_cp)"
+                . " JOIN " . MySQL_Pre . "GENDER M on (P.gender=M.gender)"
                 . " JOIN " . MySQL_Pre . "DESG_STATUS N on (P.status=N.status)"
                 . " JOIN " . MySQL_Pre . "Block_muni X on (P.HOMEBLOCK_CODE=X.block_municd)"
-                . " where P.Deleted=0 AND O.blockmuni='" . PE\GetVal($_SESSION, 'BlockCode') . "' AND P.off_code_cp='" . PE\GetVal($_POST, 'off_code') . "' ";
+                . " where P.Deleted=0 AND O.blockmuni='" . PE\GetVal($_SESSION, 'BlockCode')
+                . "' AND P.off_code_cp='" . PE\GetVal($_POST, 'off_code') . "' {$ShowDelete}";
         echo "<B>Office: </b>"
         . $Data->do_max_query("Select CONCAT('[',off_code,'] - [',office,'] - [',address1,']') "
                 . "from " . MySQL_Pre . "office Where off_code='" . PE\GetVal($_POST, 'off_code') . "'") . "<br/>";

@@ -17,11 +17,10 @@ class PDF extends FPDF {
   public $cols;
   public $fh = 3.5;
   private $PrintHeader = true;
-  private $query;
   private $CustomHeaderPrinting = false;
 
-  function PDF() {
-    $this->FPDF('P');
+  function PDF($Orientation = 'P', $Unit = 'mm', $PageSize = 'A4') {
+    $this->FPDF($Orientation, $Unit, $PageSize);
     $this->SetAuthor('PGE 2013 Paschim Medinipur 1.0');
     $this->SetCreator('NIC Paschim Medinipur');
     $this->AliasNbPages();
