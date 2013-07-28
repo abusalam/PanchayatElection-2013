@@ -13,7 +13,7 @@ switch (PE\GetVal($_POST, 'CmdSubmit')) {
   case 'Office-wise Scroll':
     include 'CountingOffScroll.php';
     break;
-  case 'Counting Hall-wise Scroll':
+  case 'Counting Hall-wise Decoding List':
     include 'CountingHallScroll.php';
     break;
   case 'Counting Personnel Decoding List':
@@ -75,7 +75,7 @@ PE\HtmlHeader("Report");
       <input type="submit" name="CmdSubmit" value="Single Appointment Letter"/>
       <input type="submit" name="CmdSubmit" value="Counting Personnel Scroll"/>
       <input type="submit" name="CmdSubmit" value="Office-wise Scroll"/>
-      <input type="submit" name="CmdSubmit" value="Counting Hall-wise Scroll"/>
+      <input type="submit" name="CmdSubmit" value="Counting Hall-wise Decoding List"/>
       <input type="submit" name="CmdSubmit" value="Counting Personnel Decoding List"/>
       <hr />
     </form>

@@ -196,8 +196,8 @@ class PDF extends FPDF {
     $this->SetFont('Arial', 'B', 10);
     $this->SetTextColor(0);
     $this->Cell(0, 7, "Panchayat General Election 2013", 0, 1, "C");
-    $this->SetFont('Arial', 'B', 8);
-    $this->Cell(0, 5, \PanchayatElection\GetVal($_SESSION, 'PartName'), 0, 1, "C");
+    //$this->SetFont('Arial', 'B', 8);
+    //$this->Cell(0, 5, \PanchayatElection\GetVal($_SESSION, 'PartName'), 0, 1, "C");
     //$this->CustomHeader();
   }
 
